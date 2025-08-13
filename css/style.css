@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+/* Estilos Gerais */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding-top: 65px;
+    background-color: #fdf6f8;
+}
+
+/* ESTILOS DO CABEÇALHO (FIXO) */
+header {
+    width: 100%; height: 65px; background-color: #FADADD; box-shadow: 0 2px 10px rgba(0,0,0,0.08); position: fixed; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #F8B4CB;
+}
+.header-small { display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%; }
+.header-logo-small { height: 45px; width: auto; }
+.header-title-small { font-family: 'Pacifico', cursive; font-size: 24px; color: #a33e6b; line-height: 1; }
+
+/* CONTEÚDO PRINCIPAL CENTRALIZADO */
+main {
+    width: 90%; max-width: 1000px; margin: 25px auto; padding: 15px; box-sizing: border-box;
+}
+.category-title {
+    font-size: 1.5em; color: #a33e6b; padding-bottom: 5px; margin-top: 20px; margin-bottom: 15px; border-bottom: 2px solid #F86DB3;
+}
+.product-item {
+    display: flex; justify-content: space-between; align-items: center; background-color: #FEF6F9; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border: 1px solid #FADADD;
+}
+.product-info { flex-grow: 1; padding-right: 15px; }
+.product-name { font-size: 1.1em; font-weight: bold; color: #a33e6b; margin: 0 0 5px 0; }
+.product-description { font-size: 0.9em; color: #666; margin: 0 0 10px 0; }
+.product-price { font-size: 1.2em; font-weight: bold; color: #F86DB3; margin: 0; }
+.product-image-container { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+.product-image { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+
+.add-button {
+    position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); background-color: #F86DB3; color: white; border: 2px solid white; border-radius: 50%; width: 35px; height: 35px; font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.add-button:hover { background-color: #e15ca0; }
+
+.checkout-area {
+    width: 90%; max-width: 1000px; margin: 25px auto; display: flex; flex-wrap: wrap; gap: 20px;
+}
+.cart-section, .customer-details {
+    background-color: #ffffff; border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box; flex: 1; min-width: 300px;
+}
+h2 { color: #a33e6b; text-align: center; font-size: 1.5em; margin-top: 0; }
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+.form-group input, .form-group select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; }
+
+/* NOVO ESTILO PARA O INFORMATIVO DE TAXA */
+.taxa-info-box {
+    display: none; /* Começa escondido */
+    background-color: #fdf6f8;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #FADADD;
+    margin-top: -5px;
+    margin-bottom: 15px;
+    font-size: 0.85em; /* Fonte menor */
+    color: #a33e6b;
+    line-height: 1.4;
+    white-space: pre-line; /* Respeita as quebras de linha do JavaScript */
+}
+
+.cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+.item-info { flex: 1; text-align: left; }
+.item-name { display: block; }
+.item-price { font-size: 0.9em; color: #666; }
+.item-controls { display: flex; align-items: center; gap: 8px; }
+.quantity-label { font-size: 0.9em; }
+.quantity-input { width: 50px; text-align: center; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
+.remove-button { background-color: #ff4d4d; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 25px; padding: 0; }
+
+.total-details { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; }
+.total-line { display: flex; justify-content: space-between; font-size: 1em; margin-bottom: 5px; color: #333; }
+.total-line.final-total { font-size: 1.2em; font-weight: bold; margin-top: 10px; color: #a33e6b; }
+
+.final-checkout-button-container { width: 90%; max-width: 1000px; margin: 20px auto; }
+#checkout-button { width: 100%; padding: 1rem; font-size: 1.2em; background-color: #F86DB3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background-color 0.2s; }
+#checkout-button:hover { background-color: #e15ca0; }
+
+/* ESTILOS DO POP-UP DO PIX */
+.pix-popup-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; z-index: 2000;
+}
+.pix-popup-content {
+    background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); text-align: center; position: relative; width: 90%; max-width: 320px;
+}
+.pix-popup-content h3 { color: #a33e6b; margin-top: 0; margin-bottom: 10px; font-size: 1.4em; }
+.pix-popup-content p { margin: 0 0 15px 0; color: #666; }
+.pix-qrcode { max-width: 100%; height: auto; border: 1px solid #eee; border-radius: 5px; margin-bottom: 15px; }
+.pix-key-container {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;
+}
+#pix-key { font-size: 1em; font-weight: bold; color: #333; word-break: break-all; text-align: left; }
+.pix-key-container button {
+    background-color: #F86DB3; color: white; border: none; border-radius: 5px; padding: 8px 15px; cursor: pointer; font-size: 0.9em; font-weight: normal; flex-shrink: 0;
+}
+.pix-key-container button:hover { background-color: #e15ca0; }
+.close-button {
+    position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: normal; color: #aaa; cursor: pointer; line-height: 1;
+}
+.close-button:hover { color: #333; }
+
+/* ======================================== */
+/* ESTILOS PARA PRODUTO ESGOTADO */
+/* ======================================== */
+
+/* Deixa o card do produto com uma aparência "apagada" */
+.product-item.esgotado {
+    opacity: 0.6;
+    background-color: #f5f5f5;
+}
+
+/* Estilo para o botão "Esgotado" */
+.add-button-esgotado {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #a9a9a9; /* Cor cinza */
+    color: white;
+    border: 2px solid white;
+    border-radius: 8px; /* Deixa o botão mais retangular */
+    width: auto;
+    height: auto;
+    padding: 5px 10px; /* Ajusta o padding */
+    font-size: 14px; /* Fonte menor */
+    font-weight: bold;
+    cursor: not-allowed; /* Cursor de "não permitido" */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
