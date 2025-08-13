@@ -1,9 +1,11 @@
+// O CÓDIGO COMPLETO ESTÁ AQUI
 let products = [];
 let cart = [];
 let taxaEntregaAtual = 0;
+let notificacaoTimeout;
 
 const bairros = [
-    { nome: "Barra azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil novo(vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da lagoa (ifma)", taxa: 8.00 }, { nome: "Parque das nações", taxa: 10.00 }, { nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, {nome: "Vila Ildemar", taxa: 9.00} ,{ nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila sucuri prox a garrote", taxa: 6.00 }
+    { nome: "Barra azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil novo(vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da lagoa (ifma)", taxa: 8.00 }, { nome: "Parque das nações", taxa: 10.00 }, { nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, { nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila sucuri prox a garrote", taxa: 6.00 }
 ];
 bairros.sort((a, b) => a.nome.localeCompare(b.nome));
 bairros.unshift({ nome: "Selecione o bairro...", taxa: 0 });
@@ -46,9 +48,12 @@ function renderProducts() {
             productsByCategory[categoria].forEach(product => {
                 const productElement = document.createElement('div');
                 productElement.className = `product-item ${product.estoque <= 0 ? 'esgotado' : ''}`;
+                productElement.dataset.productId = product.id;
+                
                 let buttonHTML = (product.estoque > 0)
                     ? `<button class="add-button" onclick="addToCart('${product.id}')">+</button>`
                     : `<button class="add-button-esgotado" disabled>Esgotado</button>`;
+                
                 productElement.innerHTML = `
                     <div class="product-info">
                         <h4 class="product-name">${product.name}</h4>
@@ -67,13 +72,25 @@ function renderProducts() {
 
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
-    if (product.estoque <= 0) {
-        alert("Desculpe, este produto está esgotado.");
-        return;
+    if (!product) return;
+    if (product.estoque <= 0) { alert("Desculpe, este produto está esgotado."); return; }
+    
+    const productCard = document.querySelector(`.product-item[data-product-id="${productId}"]`);
+    if (productCard) {
+        productCard.classList.add('flash-success');
+        setTimeout(() => {
+            productCard.classList.remove('flash-success');
+        }, 700);
     }
+
+    showNotificacao(`"${product.name}" adicionado!`);
+    
     const cartItem = cart.find(item => item.id === productId);
-    if (cartItem) cartItem.quantity++;
-    else cart.push({ ...product, quantity: 1 });
+    if (cartItem) {
+        cartItem.quantity++;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
     renderCart();
 }
 
@@ -93,21 +110,26 @@ function renderCart() {
                 </div>
                 <div class="item-controls">
                     <label for="quantity-${item.id}" class="quantity-label">Qtd:</label>
-                    <input type="number" id="quantity-${item.id}" class="quantity-input" value="${item.quantity}" min="0" onchange="updateQuantity('${item.id}', this.value)">
+                    <input type="number" id="quantity-${item.id}" class="quantity-input" value="${item.quantity}" min="1" onchange="updateQuantity('${item.id}', this.value)">
                     <button class="remove-button" onclick="removeFromCart('${item.id}')">×</button>
                 </div>`;
             cartItemsContainer.appendChild(cartItemElement);
         });
     }
     updateCartTotal();
+    updateContadorCarrinho();
 }
 
 function updateQuantity(productId, newQuantity) {
     const quantity = parseInt(newQuantity);
     const cartItem = cart.find(item => item.id === productId);
     if (cartItem) {
-        if (quantity > 0) cartItem.quantity = quantity;
-        else { removeFromCart(productId); return; }
+        if (quantity > 0) {
+            cartItem.quantity = quantity;
+        } else {
+            removeFromCart(productId);
+            return;
+        }
     }
     renderCart();
 }
@@ -139,20 +161,33 @@ function checkout() {
     if (cart.length === 0) { alert("Seu carrinho está vazio!"); return; }
     if (!name || !address || !paymentMethod) { alert("Por favor, preencha seus dados e a forma de pagamento."); return; }
     if (bairroSelect.value === "Selecione o bairro...") { alert("Por favor, selecione um bairro para a entrega."); return; }
+    
+    const displayName = name.trim().split(' ').slice(0, 2).join(' ');
+
     const numeroWhatsapp = '5599991675891';
-    let message = `Olá! Gostaria de fazer um novo pedido pelo site:\n\n*RESUMO DO PEDIDO*\n\n`;
-    message += `*CLIENTE:*\nNome: ${name}\n`;
-    if (phone) message += `WhatsApp: ${phone}\n`;
-    message += `Endereço: ${address}, ${bairroNome}\n\n`;
-    message += `*ITENS:*\n`;
-    cart.forEach(item => { message += `${item.quantity}x - ${item.name}\n`; });
+    
+    let message = `*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*\n\n`;
+    message += `*•••  PEDIDO ${displayName}  •••*\n\n\n`;
+    message += `*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n\n`;
+    message += `*VALOR DA ENTREGA:* *R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}*\n\n`;
+    message += `*PAGAMENTO:* *${paymentMethod}*`;
+    if (paymentMethod === 'Dinheiro' && trocoPara) {
+        message += ` *(Troco para R$ ${trocoPara})*`;
+    }
+    message += `\n`;
+    if (phone) {
+        message += `\n*TELEFONE:* *${phone}*\n`;
+    }
+    message += `\n--- *ITENS DO PEDIDO* ---\n`;
+    cart.forEach(item => {
+        message += `*${item.quantity}x ${item.name}* - *R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}*\n`;
+    });
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    message += `\nSubtotal: R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-    message += `\nTaxa de Entrega: R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}`;
     const totalFinal = subtotal + taxaEntregaAtual;
-    message += `\n*Total: R$ ${totalFinal.toFixed(2).replace('.', ',')}*\n`;
-    message += `*Forma de Pagamento: ${paymentMethod}*`;
-    if (paymentMethod === 'Dinheiro' && trocoPara) { message += `\n*Troco para: R$ ${trocoPara}*`; }
+    message += `\n*Subtotal:* *R$ ${subtotal.toFixed(2).replace('.', ',')}*`;
+    message += `\n*Total do Pedido:* *R$ ${totalFinal.toFixed(2).replace('.', ',')}*`;
+    message += `\n\n*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*`;
+    
     const whatsappUrl = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
@@ -176,7 +211,36 @@ function copyPixKey() {
     }
 }
 
+function showNotificacao(mensagem) {
+    const notificacao = document.getElementById('notificacao-carrinho');
+    notificacao.textContent = mensagem;
+    notificacao.classList.add('visible');
+    clearTimeout(notificacaoTimeout);
+    notificacaoTimeout = setTimeout(() => {
+        notificacao.classList.remove('visible');
+    }, 3000);
+}
+
+function updateContadorCarrinho() {
+    const contador = document.getElementById('contador-carrinho');
+    const totalItens = cart.reduce((total, item) => total + item.quantity, 0);
+    contador.textContent = totalItens;
+    if (totalItens > 0) {
+        contador.classList.add('visible');
+    } else {
+        contador.classList.remove('visible');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // LÓGICA DA TELA DE SPLASH
+    const splashScreen = document.getElementById('splash-screen');
+    if (splashScreen) {
+        setTimeout(() => {
+            splashScreen.classList.add('hidden');
+        }, 2000);
+    }
+
     const bairroSelect = document.getElementById('bairro-select');
     bairros.forEach(bairro => {
         const option = document.createElement('option');
@@ -193,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutButton = document.getElementById('checkout-button');
     checkoutButton.addEventListener('click', checkout);
     
-    // ----- LÓGICA DO FORMULÁRIO DE PAGAMENTO (COMPLETA E CORRIGIDA) -----
     const paymentMethodSelect = document.getElementById('payment-method');
     const trocoSection = document.getElementById('troco-section');
     const trocoInput = document.getElementById('troco-para');
@@ -204,21 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     paymentMethodSelect.addEventListener('change', (event) => {
         const selectedValue = event.target.value;
-
-        // Lógica do PIX
-        if (selectedValue === 'Pix') {
-            openPixPopup();
-        }
-
-        // Lógica do Troco
-        if (selectedValue === 'Dinheiro') {
-            trocoSection.style.display = 'block';
-        } else {
-            trocoSection.style.display = 'none';
-            trocoInput.value = '';
-        }
-
-        // LÓGICA RESTAURADA DO AVISO DE TAXA
+        if (selectedValue === 'Pix') { openPixPopup(); }
+        if (selectedValue === 'Dinheiro') { trocoSection.style.display = 'block'; }
+        else { trocoSection.style.display = 'none'; trocoInput.value = ''; }
         if (selectedValue === 'Cartão de Crédito') {
             taxaInfoBox.innerText = infoTaxaCredito;
             taxaInfoBox.style.display = 'block';
@@ -231,17 +282,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    trocoInput.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9.,]/g, '');
-    });
+    trocoInput.addEventListener('input', function() { this.value = this.value.replace(/[^0-9.,]/g, ''); });
 
     const pixPopup = document.getElementById('pix-popup');
     pixPopup.addEventListener('click', function(event) {
-        if (event.target === this) {
-            closePixPopup();
-        }
+        if (event.target === this) { closePixPopup(); }
     });
     
+    const carrinhoFlutuante = document.getElementById('carrinho-flutuante');
+    carrinhoFlutuante.addEventListener('click', () => {
+        document.querySelector('.checkout-area').scrollIntoView({ behavior: 'smooth' });
+    });
+
     renderCart();
     fetchProducts();
 });
