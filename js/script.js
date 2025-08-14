@@ -167,7 +167,7 @@ function checkout() {
     const numeroWhatsapp = '5599991675891';
     
     let message = `*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*\n\n`;
-    message += `*•••  PEDIDO ${displayName}  •••*\n\n\n`;
+    message += `*•••  PEDIDO: ${displayName}  •••*\n\n\n`;
     message += `*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n\n`;
     message += `*VALOR DA ENTREGA:* *R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}*\n\n`;
     message += `*PAGAMENTO:* *${paymentMethod}*`;
