@@ -38,7 +38,7 @@ function renderProducts() {
         acc[product.categoria].push(product);
         return acc;
     }, {});
-    const categoryOrder = ['Promoções', 'Brownies', 'Doces', 'Salgados', 'Bebidas'];
+    const categoryOrder = ['Promoções', 'Brownies', 'Bolos' , 'Doces', 'Salgados', 'Bebidas'];
     categoryOrder.forEach(categoria => {
         if (productsByCategory[categoria]) {
             const categoryTitle = document.createElement('h3');
