@@ -11,7 +11,7 @@
 <body>
 
     <div id="splash-screen" class="splash-screen">
-        <img src="images/Modelo-02.png" alt="Logo Oba Brownie">
+        <img src="images/Modelo-02.PNG" alt="Logo Oba Brownie">
     </div>
 
     <header>
@@ -23,7 +23,6 @@
 
     <main>
         <div id="aviso-loja-fechada" class="aviso-loja-fechada"></div>
-        
         <div id="product-list"></div>
     </main>
 
@@ -64,9 +63,14 @@
                 <select id="bairro-select"></select>
             </div>
             <div class="form-group">
-                <label for="customer-address">Endereço (Rua, Nº, Ponto de Ref.)</label>
-                <input type="text" id="customer-address" placeholder="Ex: Rua das Flores, 123, Próx. ao mercado">
+                <label for="customer-address">Endereço (Rua e Número)</label>
+                <input type="text" id="customer-address" placeholder="Ex: Rua das Flores, 123">
             </div>
+            <div class="form-group">
+                <label for="customer-reference">Ponto de Referência (Opcional)</label>
+                <input type="text" id="customer-reference" placeholder="Ex: Próximo ao mercado, casa azul">
+            </div>
+            
             <div class="form-group">
                 <label for="payment-method">Forma de Pagamento</label>
                 <select id="payment-method">
@@ -79,7 +83,7 @@
             </div>
             <div id="taxa-info" class="taxa-info-box"></div>
             <div id="troco-section" class="form-group" style="display: none;">
-                <label for="troco-para">Troco para quanto? (Opcional)</label>
+                <label for="troco-para">Troco para quanto?</label>
                 <input type="text" id="troco-para" inputmode="decimal" placeholder="Ex: 50,00">
             </div>
         </div>
