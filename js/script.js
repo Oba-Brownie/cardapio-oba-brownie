@@ -1,11 +1,52 @@
-const DADOS_LOJA = { horarioAbertura: 12.5, horarioFechamento: 20, diasFuncionamento: [0, 1, 2, 3, 4, 5, 6] };
-let products = [], cart = [], taxaEntregaAtual = 0, notificacaoTimeout;
+// ===============================================
+// CONFIGURAÇÕES DA LOJA - EDITE AQUI SEUS HORÁRIOS
+// ===============================================
+const DADOS_LOJA = {
+    horarioAbertura: 12.5, // 12:30
+    horarioFechamento: 17.5, // 17:30
+    diasFuncionamento: [0, 1, 2, 3, 4, 5, 6] // Todos os dias
+};
+
+// --- VARIÁVEIS GLOBAIS ---
+let products = [];
+let cart = [];
+let taxaEntregaAtual = 0;
+let notificacaoTimeout;
+let lojaForcadaFechada = false; // Para o controle via Contentful
+
 const bairros = [ { nome: "Barra Azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil Novo (vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do Urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da Lagoa", taxa: 8.00 }, { nome: "Parque das Nações", taxa: 10.00 }, { nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, { nome: "Vila Ildemar", taxa: 9.00 },{ nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila Sucuri", taxa: 6.00 } ];
 bairros.sort((a, b) => a.nome.localeCompare(b.nome));
 bairros.unshift({ nome: "Selecione o bairro...", taxa: 0 });
-const CONTENTFUL_SPACE_ID = '2v6jjkbg0sm7', CONTENTFUL_ACCESS_TOKEN = 'rcR_gnOYLU05IPwYNhFXS2PABltFsfh-X1Flare9fds';
 
-function lojaEstaAberta(){ const agora = new Date(), agoraBrasil = new Date(agora.valueOf() - 3 * 60 * 60 * 1000), diaAtual = agoraBrasil.getUTCDay(), horaDecimal = agoraBrasil.getUTCHours() + agoraBrasil.getUTCMinutes() / 60; return DADOS_LOJA.diasFuncionamento.includes(diaAtual) && horaDecimal >= DADOS_LOJA.horarioAbertura && horaDecimal < DADOS_LOJA.horarioFechamento; }
+const CONTENTFUL_SPACE_ID = '2v6jjkbg0sm7', CONTENTFUL_ACCESS_TOKEN = 'rcR_gnOYLU05IPwYNhFXS2PABltFsfh-X1Flare9fds';
+// Deixe este campo em branco por enquanto, a menos que você já o tenha criado no Contentful
+const CONFIG_ENTRY_ID = '2sCM9bEm5AxhgQSVXfY6pU';
+
+// --- FUNÇÕES ---
+
+async function fetchConfiguracaoLoja() {
+    if (!CONFIG_ENTRY_ID) return;
+    const url = `https://cdn.contentful.com/spaces/${CONTENTFUL_SPACE_ID}/environments/master/entries/${CONFIG_ENTRY_ID}?access_token=${CONTENTFUL_ACCESS_TOKEN}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Falha ao buscar configuração.');
+        const data = await response.json();
+        lojaForcadaFechada = data.fields.forcarFechamento;
+        if (data.fields.horarioAbertura) DADOS_LOJA.horarioAbertura = data.fields.horarioAbertura;
+        if (data.fields.horarioFechamento) DADOS_LOJA.horarioFechamento = data.fields.horarioFechamento;
+    } catch (error) { console.error("Erro ao buscar configuração da loja:", error); }
+}
+
+function lojaEstaAberta(){
+    if (lojaForcadaFechada) return false;
+    const agora = new Date();
+    const agoraBrasil = new Date(agora.valueOf() - (3 * 60 * 60 * 1000));
+    const diaAtual = agoraBrasil.getUTCDay();
+    const horaDecimal = agoraBrasil.getUTCHours() + (agoraBrasil.getUTCMinutes() / 60);
+    const hojeFunciona = DADOS_LOJA.diasFuncionamento.includes(diaAtual);
+    const dentroDoHorario = horaDecimal >= DADOS_LOJA.horarioAbertura && horaDecimal < DADOS_LOJA.horarioFechamento;
+    return hojeFunciona && dentroDoHorario;
+}
 
 async function fetchProducts(lojaAberta) {
     const url = `https://cdn.contentful.com/spaces/${CONTENTFUL_SPACE_ID}/environments/master/entries?access_token=${CONTENTFUL_ACCESS_TOKEN}&content_type=obaBrownie&order=fields.ordem`;
@@ -140,6 +181,7 @@ function checkout() {
     const phone = document.getElementById('customer-phone').value;
     const address = document.getElementById('customer-address').value;
     const reference = document.getElementById('customer-reference').value;
+    const observation = document.getElementById('customer-observation').value;
     const paymentMethod = document.getElementById('payment-method').value;
     const trocoPara = document.getElementById('troco-para').value;
     const bairroSelect = document.getElementById('bairro-select');
@@ -160,6 +202,7 @@ function checkout() {
     if (paymentMethod === 'Dinheiro' && trocoPara) { message += ` *(Troco para R$ ${trocoPara})*`; }
     message += `\n`;
     if (phone) { message += `\n*TELEFONE:* *${phone}*\n`; }
+    if (observation) { message += `\n*OBSERVAÇÃO:* *${observation.trim()}*\n`; }
     message += `\n--- *ITENS DO PEDIDO* ---\n`;
     cart.forEach(item => { message += `*${item.quantity}x ${item.name}* - *R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}*\n`; });
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -203,19 +246,28 @@ function updateContadorCarrinho() {
     else { contador.classList.remove('visible'); }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const splashScreen = document.getElementById('splash-screen');
     if (splashScreen) { setTimeout(() => { splashScreen.classList.add('hidden'); }, 2000); }
+    
+    await fetchConfiguracaoLoja();
     const lojaAberta = lojaEstaAberta();
     const checkoutButton = document.getElementById('checkout-button');
     if (!lojaAberta) {
         document.body.classList.add('loja-fechada-filter');
         const avisoContainer = document.getElementById('aviso-loja-fechada');
-        avisoContainer.innerHTML = `<p><strong>Desculpe, estamos fechados no momento!</strong></p><p>Nosso horário de funcionamento é das 12:30 às 17:30.</p>`;
+        let avisoMsg = `<p><strong>Desculpe, estamos fechados no momento!</strong></p>`;
+        if (!lojaForcadaFechada) {
+            const abertura = `${Math.floor(DADOS_LOJA.horarioAbertura)}:${(DADOS_LOJA.horarioAbertura % 1 * 60).toString().padStart(2, '0')}`;
+            const fechamento = `${Math.floor(DADOS_LOJA.horarioFechamento)}:${(DADOS_LOJA.horarioFechamento % 1 * 60).toString().padStart(2, '0')}`;
+            avisoMsg += `<p>Nosso horário de funcionamento é das ${abertura} às ${fechamento}.</p>`;
+        }
+        avisoContainer.innerHTML = avisoMsg;
         avisoContainer.style.display = 'block';
         checkoutButton.disabled = true;
         checkoutButton.textContent = 'Estamos Fechados :(';
     }
+    
     const bairroSelect = document.getElementById('bairro-select');
     bairros.forEach(bairro => {
         const option = document.createElement('option');
