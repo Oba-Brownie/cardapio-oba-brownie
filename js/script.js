@@ -65,7 +65,7 @@ function renderProducts(lojaAberta) {
     productListContainer.innerHTML = '';
     if (!lojaAberta) {
         const productsByCategory = products.reduce((acc, product) => { if (!acc[product.categoria]) acc[product.categoria] = []; acc[product.categoria].push(product); return acc; }, {});
-        const categoryOrder = ['Promoções', 'Brownies', 'Bolos','Doces', 'Salgados', 'Bebidas'];
+        const categoryOrder = ['Promoções', 'Brownies', 'Bolos','Doces', 'Salgados', 'Geladinho', 'Bebidas'];
         categoryOrder.forEach(categoria => {
             if (productsByCategory[categoria]) {
                 const categoryTitle = document.createElement('h3');
@@ -86,7 +86,7 @@ function renderProducts(lojaAberta) {
     const availableProducts = products.filter(p => p.estoque > 0);
     const soldOutProducts = products.filter(p => p.estoque <= 0);
     const availableProductsByCategory = availableProducts.reduce((acc, product) => { if (!acc[product.categoria]) acc[product.categoria] = []; acc[product.categoria].push(product); return acc; }, {});
-    const categoryOrder = ['Promoções', 'Brownies', 'Bolos', 'Doces', 'Salgados', 'Bebidas'];
+    const categoryOrder = ['Promoções', 'Brownies', 'Bolos', 'Doces', 'Salgados', 'Geladinho', 'Bebidas'];
     categoryOrder.forEach(categoria => {
         if (availableProductsByCategory[categoria]) {
             const categoryTitle = document.createElement('h3');
