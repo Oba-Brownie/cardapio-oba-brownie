@@ -1,26 +1,24 @@
 // ===============================================
-// CONFIGURAÇÕES DA LOJA - EDITE AQUI SEUS HORÁRIOS
+// CONFIGURAÇÕES DA LOJA
 // ===============================================
 const DADOS_LOJA = {
-    horarioAbertura: 12.5, // 12:30
-    horarioFechamento: 17.5, // 17:30
-    diasFuncionamento: [0, 1, 2, 3, 4, 5, 6] // Todos os dias
+    horarioAbertura: 12.5,
+    horarioFechamento: 17.5,
+    diasFuncionamento: [0, 1, 2, 3, 4, 5, 6]
 };
+const CONFIG_ENTRY_ID = '2sCM9bEm5AxhgQSVXfY6pU';
 
 // --- VARIÁVEIS GLOBAIS ---
 let products = [];
 let cart = [];
 let taxaEntregaAtual = 0;
 let notificacaoTimeout;
-let lojaForcadaFechada = false; // Para o controle via Contentful
+let lojaForcadaFechada = false;
 
-const bairros = [ { nome: "Barra Azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil Novo (vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do Urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da Lagoa", taxa: 8.00 }, { nome: "Parque das Nações", taxa: 10.00 }, {nome: "Parque Planalto", taxa: 8.00}, { nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, { nome: "Vila Ildemar", taxa: 9.00 },{ nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila Sucuri", taxa: 6.00 } ];
+const bairros = [ { nome: "Barra Azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil Novo (vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do Urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da Lagoa", taxa: 8.00 }, { nome: "Parque das Nações", taxa: 10.00 }, { nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, { nome: "Vila Ildemar", taxa: 9.00 },{ nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila Sucuri", taxa: 6.00 } ];
 bairros.sort((a, b) => a.nome.localeCompare(b.nome));
 bairros.unshift({ nome: "Selecione o bairro...", taxa: 0 });
-
 const CONTENTFUL_SPACE_ID = '2v6jjkbg0sm7', CONTENTFUL_ACCESS_TOKEN = 'rcR_gnOYLU05IPwYNhFXS2PABltFsfh-X1Flare9fds';
-// Deixe este campo em branco por enquanto, a menos que você já o tenha criado no Contentful
-const CONFIG_ENTRY_ID = '2sCM9bEm5AxhgQSVXfY6pU';
 
 // --- FUNÇÕES ---
 
@@ -55,16 +53,66 @@ async function fetchProducts(lojaAberta) {
         if (!response.ok) throw new Error('Falha ao carregar os produtos.');
         const data = await response.json();
         const assets = data.includes?.Asset || [];
-        products = data.items.map(item => ({ id: item.sys.id, name: item.fields.nome, description: item.fields.descricao, price: item.fields.preco, image: `https:${assets.find(asset => asset.sys.id === item.fields.imagem?.sys?.id)?.fields.file.url || '//placehold.co/400x400/ccc/999?text=Sem+Imagem'}`, categoria: item.fields.categoria, estoque: item.fields.estoque ?? 0 }));
+        products = data.items.map(item => {
+            const originalPrice = item.fields.preco;
+            const promoPrice = item.fields.precoPromocional;
+            const onSale = promoPrice && promoPrice > 0;
+
+            return {
+                id: item.sys.id,
+                name: item.fields.nome,
+                description: item.fields.descricao,
+                price: onSale ? promoPrice : originalPrice,
+                originalPrice: onSale ? originalPrice : null,
+                image: `https:${assets.find(asset => asset.sys.id === item.fields.imagem?.sys?.id)?.fields.file.url || '//placehold.co/400x400/ccc/999?text=Sem+Imagem'}`,
+                categoria: item.fields.categoria,
+                estoque: item.fields.estoque ?? 0,
+                destaque: item.fields.destaque ?? false
+            };
+        });
         renderProducts(lojaAberta);
     } catch (error) { console.error("Erro ao buscar produtos:", error); document.getElementById('product-list').innerHTML = `<p style="text-align: center; color: red;">Não foi possível carregar o cardápio. Tente novamente mais tarde.</p>`; }
 }
 
 function renderProducts(lojaAberta) {
     const productListContainer = document.getElementById('product-list');
+    const destaquesContainer = document.getElementById('destaques-section');
     productListContainer.innerHTML = '';
+    destaquesContainer.innerHTML = '';
+
+    const destaques = products.filter(p => p.destaque && p.estoque > 0);
+    const nonDestaquesProducts = products.filter(p => !p.destaque);
+    
+    if (destaques.length > 0 && lojaAberta) {
+        destaquesContainer.style.display = 'block';
+        const title = document.createElement('h3');
+        title.className = 'category-title';
+        title.textContent = 'Destaques';
+        const carousel = document.createElement('div');
+        carousel.className = 'destaques-carousel';
+        destaques.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'card-destaque';
+            card.dataset.productId = product.id;
+            
+            let priceHTML = '';
+            if (product.originalPrice) {
+                priceHTML = `<div class="price-container-destaque"><span class="original-price">R$ ${product.originalPrice.toFixed(2).replace('.', ',')}</span><span class="promo-price">R$ ${product.price.toFixed(2).replace('.', ',')}</span></div>`;
+            } else {
+                priceHTML = `<span class="card-destaque-preco">R$ ${product.price.toFixed(2).replace('.', ',')}</span>`;
+            }
+
+            card.innerHTML = `<img src="${product.image}" alt="${product.name}"><div class="card-destaque-info"><h4>${product.name}</h4><p>${product.description}</p><div class="card-destaque-footer">${priceHTML}<button class="card-destaque-add-button" onclick="addToCart('${product.id}')">Adicionar</button></div></div>`;
+            carousel.appendChild(card);
+        });
+        destaquesContainer.appendChild(title);
+        destaquesContainer.appendChild(carousel);
+    } else {
+        destaquesContainer.style.display = 'none';
+    }
+
     if (!lojaAberta) {
-        const productsByCategory = products.reduce((acc, product) => { if (!acc[product.categoria]) acc[product.categoria] = []; acc[product.categoria].push(product); return acc; }, {});
+        const productsByCategory = nonDestaquesProducts.reduce((acc, product) => { if (!acc[product.categoria]) acc[product.categoria] = []; acc[product.categoria].push(product); return acc; }, {});
         const categoryOrder = ['Promoções', 'Brownies', 'Bolos','Doces', 'Salgados', 'Geladinho', 'Bebidas'];
         categoryOrder.forEach(categoria => {
             if (productsByCategory[categoria]) {
@@ -83,10 +131,12 @@ function renderProducts(lojaAberta) {
         });
         return;
     }
-    const availableProducts = products.filter(p => p.estoque > 0);
-    const soldOutProducts = products.filter(p => p.estoque <= 0);
+    
+    const availableProducts = nonDestaquesProducts.filter(p => p.estoque > 0);
+    const soldOutProducts = nonDestaquesProducts.filter(p => p.estoque <= 0);
     const availableProductsByCategory = availableProducts.reduce((acc, product) => { if (!acc[product.categoria]) acc[product.categoria] = []; acc[product.categoria].push(product); return acc; }, {});
     const categoryOrder = ['Promoções', 'Brownies', 'Bolos', 'Doces', 'Salgados', 'Geladinho', 'Bebidas'];
+    
     categoryOrder.forEach(categoria => {
         if (availableProductsByCategory[categoria]) {
             const categoryTitle = document.createElement('h3');
@@ -97,11 +147,20 @@ function renderProducts(lojaAberta) {
                 const productElement = document.createElement('div');
                 productElement.className = 'product-item';
                 productElement.dataset.productId = product.id;
-                productElement.innerHTML = `<div class="product-info"><h4 class="product-name">${product.name}</h4><p class="product-description">${product.description}</p><p class="product-price">R$ ${product.price.toFixed(2).replace('.', ',')}</p></div><div class="product-image-container"><img src="${product.image}" alt="${product.name}" class="product-image"><button class="add-button" onclick="addToCart('${product.id}')">+</button></div>`;
+                
+                let priceHTML = '';
+                if (product.originalPrice) {
+                    priceHTML = `<div class="product-price-container"><span class="original-price">R$ ${product.originalPrice.toFixed(2).replace('.', ',')}</span><span class="promo-price">R$ ${product.price.toFixed(2).replace('.', ',')}</span></div>`;
+                } else {
+                    priceHTML = `<p class="product-price">R$ ${product.price.toFixed(2).replace('.', ',')}</p>`;
+                }
+
+                productElement.innerHTML = `<div class="product-info"><h4 class="product-name">${product.name}</h4><p class="product-description">${product.description}</p>${priceHTML}</div><div class="product-image-container"><img src="${product.image}" alt="${product.name}" class="product-image"><button class="add-button" onclick="addToCart('${product.id}')">+</button></div>`;
                 productListContainer.appendChild(productElement);
             });
         }
     });
+
     if (soldOutProducts.length > 0) {
         const soldOutTitle = document.createElement('h3');
         soldOutTitle.className = 'category-title';
@@ -121,11 +180,13 @@ function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
     if (product.estoque <= 0) { alert("Desculpe, este produto está esgotado."); return; }
-    const productCard = document.querySelector(`.product-item[data-product-id="${productId}"]`);
+    
+    const productCard = document.querySelector(`.product-item[data-product-id="${productId}"], .card-destaque[data-product-id="${productId}"]`);
     if (productCard) {
         productCard.classList.add('flash-success');
         setTimeout(() => { productCard.classList.remove('flash-success'); }, 700);
     }
+    
     showNotificacao(`"${product.name}" adicionado!`);
     const cartItem = cart.find(item => item.id === productId);
     if (cartItem) { cartItem.quantity++; }
@@ -193,7 +254,7 @@ function checkout() {
     }
     const displayName = name.trim().split(' ').slice(0, 2).join(' ');
     const numeroWhatsapp = '5599991675891';
-    let message = `*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*\n\n`;
+    let message = `*----------------------------------*\n\n`;
     message += `*•••  PEDIDO ${displayName}  •••*\n\n\n`;
     message += `*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n`;
     if (reference) { message += `*PONTO DE REFERÊNCIA:* *${reference.trim()}*\n`; }
@@ -209,7 +270,7 @@ function checkout() {
     const totalFinal = subtotal + taxaEntregaAtual;
     message += `\n*Subtotal:* *R$ ${subtotal.toFixed(2).replace('.', ',')}*`;
     message += `\n*Total do Pedido:* *R$ ${totalFinal.toFixed(2).replace('.', ',')}*`;
-    message += `\n\n*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*`;
+    message += `\n\n*----------------------------------*`;
     const whatsappUrl = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }

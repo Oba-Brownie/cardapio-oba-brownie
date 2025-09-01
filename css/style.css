@@ -1,75 +1,156 @@
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
 
 /* ESTILOS DA TELA DE ABERTURA (SPLASH SCREEN) */
-.splash-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #fdf6f8; /* Fundo branco */
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.8s ease-out, visibility 0.8s;
-}
-
-.splash-screen.hidden {
-    opacity: 0;
-    visibility: hidden; /* Garante que a tela não seja clicável depois de sumir */
-}
-
-.splash-screen img {
-    max-width: 80%;
-    max-height: 80%;
-    width: 300px;
-}
+.splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #ffffff; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease-out, visibility 0.8s; }
+.splash-screen.hidden { opacity: 0; visibility: hidden; }
+.splash-screen img { max-width: 80%; max-height: 80%; width: 300px; }
 
 /* Estilos Gerais */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    margin: 0;
-    padding-top: 65px;
-    background-color: #fdf6f8;
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+    margin: 0; 
+    padding-top: 55px; /* AUMENTADO: Dá mais espaço para a logo "vazar" para o conteúdo */
+    background-color: #fdf6f8; 
 }
 
-/* A regra do filtro cinza foi removida daqui */
-
+/* ================================================= */
 /* ESTILOS DO CABEÇALHO (FIXO) */
-header { width: 100%; height: 65px; background-color: #FADADD; box-shadow: 0 2px 10px rgba(0,0,0,0.08); position: fixed; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #F8B4CB; }
-.header-small { display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%; }
-.header-logo-small { height: 45px; width: auto; }
-.header-title-small { font-family: 'Pacifico', cursive; font-size: 24px; color: #a33e6b; line-height: 1; }
+/* ================================================= */
 
-/* CONTEÚDO PRINCIPAL CENTRALIZADO */
-main { width: 90%; max-width: 1000px; margin: 25px auto; padding: 15px; box-sizing: border-box; }
-
-/* AVISO DE LOJA FECHADA */
-.aviso-loja-fechada {
-    display: none; background-color: #FADADD; border: 2px solid #F8B4CB; color: #a33e6b; text-align: center; padding: 15px; border-radius: 10px; margin-bottom: 25px;
+header {
+    width: 100%;
+    height: 75px;
+    background-color: #F86DB3;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center; /* Mantém o alinhamento central */
+    justify-content: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #F8B4CB;
 }
-.aviso-loja-fechada p { margin: 5px 0; }
 
+.header-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-logo-small { 
+    height: 100px; 
+    width: 100px;  
+    padding-top: 30px;
+    object-fit: cover; 
+}
+
+/* ================================================= */
+/* BOTÃO DE ENCOMENDAS (ACIMA DOS DESTAQUES) */
+/* ================================================= */
+
+.encomenda-whatsapp-container {
+    width: 112%;
+    max-width: 1000px;
+    margin: 0 5px 5px 5px; /* Margem superior zerada pois o body já tem padding */
+    display: flex;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    padding: 0 15px 0 0;
+}
+
+.encomenda-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #F86DB3;
+    border-radius: 4px;
+    padding: 8px 15px ;
+    text-decoration: none;
+    color: #a33e6b;
+    font-weight: bold;
+    text-align: center;
+    transition: transform 0.2s, background-color 0.2s;
+    line-height: 1.3;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.encomenda-button:hover {
+    transform: translateY(-3px);
+    background-color: #F86DB3;
+}
+
+.encomenda-text {
+    width: 109%;
+    font-size: 0.7em;
+    font-weight: bold;
+    text-align: center;
+    color: #ec968f;
+    max-width: 1000px;
+    margin: 0 5px 0 5px; /* Margem superior zerada pois o body já tem padding */
+    display: flex;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    padding: 8px 15px ;
+}
+
+.whatsapp-label {
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    font-size: 0.8em;
+}
+
+.whatsapp-icon-image {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+}
+
+/* O resto do seu CSS continua aqui */
+main { width: 90%; max-width: 1000px; margin: 0 auto 25px auto; padding: 15px; box-sizing: border-box; }
+.aviso-loja-fechada { display: none; background-color: #FADADD; border: 2px solid #F8B4CB; color: #a33e6b; text-align: center; padding: 15px; border-radius: 10px; margin-bottom: 25px; }
+.aviso-loja-fechada p { margin: 5px 0; }
+.destaques-section { display: none; margin-bottom: 30px; }
+.destaques-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding-bottom: 15px; scrollbar-width: thin; scrollbar-color: #F8B4CB #fdf6f8; }
+.destaques-carousel::-webkit-scrollbar { height: 8px; }
+.destaques-carousel::-webkit-scrollbar-track { background: #fdf6f8; border-radius: 10px; }
+.destaques-carousel::-webkit-scrollbar-thumb { background-color: #F8B4CB; border-radius: 10px; border: 2px solid #fdf6f8; }
+.card-destaque { flex: 0 0 280px; scroll-snap-align: start; background-color: #ffffff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s; }
+.card-destaque:hover { transform: translateY(-5px); }
+.card-destaque img { width: 100%; height: 150px; object-fit: cover; }
+.card-destaque-info { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+.card-destaque-info h4 { font-size: 1.1em; font-weight: bold; color: #a33e6b; margin: 0 0 5px 0; }
+.card-destaque-info p { font-size: 0.9em; color: #666; margin: 0 0 10px 0; flex-grow: 1; }
+.card-destaque-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+.card-destaque-add-button { background-color: #F86DB3; color: white; border: none; border-radius: 8px; padding: 8px 12px; font-weight: bold; cursor: pointer; }
 .category-title { font-size: 1.5em; color: #a33e6b; padding-bottom: 5px; margin-top: 20px; margin-bottom: 15px; border-bottom: 2px solid #F86DB3; }
-.product-item { display: flex; justify-content: space-between; align-items: center; background-color: #FEF6F9; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border: 2px solid transparent; transition: transform 0.2s ease-out, box-shadow 0.2s, border-color 0.2s; }
+.product-item { display: flex; justify-content: space-between; align-items: center; background-color: #FEF6F9; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border: 2px solid #FADADD; transition: transform 0.2s ease-out, box-shadow 0.2s, border-color 0.2s; }
 .product-info { flex-grow: 1; padding-right: 15px; }
 .product-name { font-size: 1.1em; font-weight: bold; color: #a33e6b; margin: 0 0 5px 0; }
 .product-description { font-size: 0.9em; color: #666; margin: 0 0 10px 0; }
+.price-container-destaque, .product-price-container { line-height: 1.2; }
+.original-price { font-size: 0.9em; color: #999; text-decoration: line-through; display: block; }
+.promo-price, .card-destaque-preco { font-size: 1.2em; font-weight: bold; color: #F86DB3; }
 .product-price { font-size: 1.2em; font-weight: bold; color: #F86DB3; margin: 0; }
 .product-image-container { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
 .product-image { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-
 .add-button { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); background-color: #F86DB3; color: white; border: 2px solid white; border-radius: 50%; width: 35px; height: 35px; font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 .add-button:hover { background-color: #e15ca0; }
-
 .checkout-area { width: 90%; max-width: 1000px; margin: 25px auto; display: flex; flex-wrap: wrap; gap: 20px; }
 .cart-section, .customer-details { background-color: #ffffff; border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box; flex: 1; min-width: 300px; }
 h2 { color: #a33e6b; text-align: center; font-size: 1.5em; margin-top: 0; }
 .form-group { margin-bottom: 15px; text-align: left; }
 .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-.form-group input, .form-group select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; }
-
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; resize: vertical; }
 .taxa-info-box { display: none; background-color: #fdf6f8; padding: 10px; border-radius: 5px; border: 1px solid #FADADD; margin-top: -5px; margin-bottom: 15px; font-size: 0.85em; color: #a33e6b; line-height: 1.4; white-space: pre-line; }
 .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
 .item-info { flex: 1; text-align: left; }
@@ -79,15 +160,12 @@ h2 { color: #a33e6b; text-align: center; font-size: 1.5em; margin-top: 0; }
 .quantity-label { font-size: 0.9em; }
 .quantity-input { width: 50px; text-align: center; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
 .remove-button { background-color: #ff4d4d; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 25px; padding: 0; }
-
 .total-details { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; }
 .total-line { display: flex; justify-content: space-between; font-size: 1em; margin-bottom: 5px; color: #333; }
 .total-line.final-total { font-size: 1.2em; font-weight: bold; margin-top: 10px; color: #a33e6b; }
-
 .final-checkout-button-container { width: 90%; max-width: 1000px; margin: 20px auto; }
 #checkout-button { width: 100%; padding: 1rem; font-size: 1.2em; background-color: #F86DB3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background-color 0.2s; }
 #checkout-button:hover { background-color: #e15ca0; }
-
 .pix-popup-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; z-index: 2000; }
 .pix-popup-content { background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); text-align: center; position: relative; width: 90%; max-width: 320px; }
 .pix-popup-content h3 { color: #a33e6b; margin-top: 0; margin-bottom: 10px; font-size: 1.4em; }
@@ -99,10 +177,8 @@ h2 { color: #a33e6b; text-align: center; font-size: 1.5em; margin-top: 0; }
 .pix-key-container button:hover { background-color: #e15ca0; }
 .close-button { position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: normal; color: #aaa; cursor: pointer; line-height: 1; }
 .close-button:hover { color: #333; }
-
 .product-item.esgotado { opacity: 0.6; background-color: #f5f5f5; }
 .add-button-esgotado { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); background-color: #a9a9a9; color: white; border: 2px solid white; border-radius: 8px; width: auto; height: auto; padding: 5px 10px; font-size: 14px; font-weight: bold; cursor: not-allowed; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
 .carrinho-flutuante { position: fixed; bottom: 25px; right: 25px; z-index: 1001; cursor: pointer; }
 .icone-carrinho { width: 60px; height: 60px; background-color: #F86DB3; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: relative; transition: transform 0.2s ease-in-out; }
 .icone-carrinho:hover { transform: scale(1.1); }
@@ -112,6 +188,5 @@ h2 { color: #a33e6b; text-align: center; font-size: 1.5em; margin-top: 0; }
 .notificacao-carrinho { position: absolute; bottom: 75px; right: 0; background-color: #ffffff; padding: 10px 15px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); white-space: nowrap; opacity: 0; transform: translateY(10px); visibility: hidden; transition: all 0.3s ease-in-out; pointer-events: none; }
 .notificacao-carrinho.visible { opacity: 1; transform: translateY(0); visibility: visible; }
 .notificacao-carrinho::after { content: ''; position: absolute; bottom: -8px; right: 20px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #ffffff; }
-
-.product-item.flash-success { animation: flash 0.7s ease-out; }
-@keyframes flash { 0% { transform: scale(1); } 50% { transform: scale(1.03); border-color: #F86DB3; box-shadow: 0 4px 15px rgba(0,0,0,0.12); } 100% { transform: scale(1); } }
+.product-item.flash-success, .card-destaque.flash-success { animation: flash 0.7s ease-out; }
+@keyframes flash { 0% { transform: scale(1); } 50% { transform: scale(1.03); box-shadow: 0 4px 15px rgba(0,0,0,0.12); } 100% { transform: scale(1); } }
