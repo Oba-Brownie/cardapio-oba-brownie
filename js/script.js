@@ -15,7 +15,7 @@ let taxaEntregaAtual = 0;
 let notificacaoTimeout;
 let lojaForcadaFechada = false;
 
-const bairros = [ { nome: "Barra Azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil Novo (vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do Urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da Lagoa", taxa: 8.00 }, { nome: "Parque das Nações", taxa: 10.00 }, { nome: "Parque Planalto", taxa:8.00},{ nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, { nome: "Vila Ildemar", taxa: 9.00 },{ nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila Sucuri", taxa: 6.00 } ];
+const bairros = [ { nome: "Barra Azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil Novo (vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do Urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da Lagoa", taxa: 8.00 }, { nome: "Parque das Nações", taxa: 10.00 }, { nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, { nome: "Vila Ildemar", taxa: 9.00 },{ nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila Sucuri", taxa: 6.00 } ];
 bairros.sort((a, b) => a.nome.localeCompare(b.nome));
 bairros.unshift({ nome: "Selecione o bairro...", taxa: 0 });
 const CONTENTFUL_SPACE_ID = '2v6jjkbg0sm7', CONTENTFUL_ACCESS_TOKEN = 'rcR_gnOYLU05IPwYNhFXS2PABltFsfh-X1Flare9fds';
@@ -81,7 +81,9 @@ function renderProducts(lojaAberta) {
     destaquesContainer.innerHTML = '';
 
     const destaques = products.filter(p => p.destaque && p.estoque > 0);
-    const nonDestaquesProducts = products.filter(p => !p.destaque);
+    
+    // MODIFICAÇÃO: A linha abaixo que criava a constante 'nonDestaquesProducts' foi removida.
+    // const nonDestaquesProducts = products.filter(p => !p.destaque); 
     
     if (destaques.length > 0 && lojaAberta) {
         destaquesContainer.style.display = 'block';
@@ -112,7 +114,8 @@ function renderProducts(lojaAberta) {
     }
 
     if (!lojaAberta) {
-        const productsByCategory = nonDestaquesProducts.reduce((acc, product) => { if (!acc[product.categoria]) acc[product.categoria] = []; acc[product.categoria].push(product); return acc; }, {});
+        // MODIFICAÇÃO: A variável 'nonDestaquesProducts' foi substituída pela lista principal 'products'.
+        const productsByCategory = products.reduce((acc, product) => { if (!acc[product.categoria]) acc[product.categoria] = []; acc[product.categoria].push(product); return acc; }, {});
         const categoryOrder = ['Promoções', 'Brownies', 'Bolos','Doces', 'Salgados', 'Geladinho', 'Bebidas'];
         categoryOrder.forEach(categoria => {
             if (productsByCategory[categoria]) {
@@ -132,8 +135,10 @@ function renderProducts(lojaAberta) {
         return;
     }
     
-    const availableProducts = nonDestaquesProducts.filter(p => p.estoque > 0);
-    const soldOutProducts = nonDestaquesProducts.filter(p => p.estoque <= 0);
+    // MODIFICAÇÃO: Ambas as constantes abaixo agora filtram a partir da lista principal 'products'.
+    const availableProducts = products.filter(p => p.estoque > 0);
+    const soldOutProducts = products.filter(p => p.estoque <= 0);
+
     const availableProductsByCategory = availableProducts.reduce((acc, product) => { if (!acc[product.categoria]) acc[product.categoria] = []; acc[product.categoria].push(product); return acc; }, {});
     const categoryOrder = ['Promoções', 'Brownies', 'Bolos', 'Doces', 'Salgados', 'Geladinho', 'Bebidas'];
     
@@ -175,7 +180,6 @@ function renderProducts(lojaAberta) {
         });
     }
 }
-
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
@@ -254,7 +258,7 @@ function checkout() {
     }
     const displayName = name.trim().split(' ').slice(0, 2).join(' ');
     const numeroWhatsapp = '5599991675891';
-    let message = `*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*\n\n`;
+    let message = `*----------------------------------*\n\n`;
     message += `*•••  PEDIDO ${displayName}  •••*\n\n\n`;
     message += `*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n`;
     if (reference) { message += `*PONTO DE REFERÊNCIA:* *${reference.trim()}*\n`; }
@@ -270,7 +274,7 @@ function checkout() {
     const totalFinal = subtotal + taxaEntregaAtual;
     message += `\n*Subtotal:* *R$ ${subtotal.toFixed(2).replace('.', ',')}*`;
     message += `\n*Total do Pedido:* *R$ ${totalFinal.toFixed(2).replace('.', ',')}*`;
-    message += `\n\n*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*`;
+    message += `\n\n*----------------------------------*`;
     const whatsappUrl = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
