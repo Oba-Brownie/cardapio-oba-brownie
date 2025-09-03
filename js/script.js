@@ -258,7 +258,7 @@ function checkout() {
     }
     const displayName = name.trim().split(' ').slice(0, 2).join(' ');
     const numeroWhatsapp = '5599991675891';
-    let message = `*----------------------------------*\n\n`;
+    let message = `*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*\n\n`;
     message += `*•••  PEDIDO ${displayName}  •••*\n\n\n`;
     message += `*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n`;
     if (reference) { message += `*PONTO DE REFERÊNCIA:* *${reference.trim()}*\n`; }
@@ -274,7 +274,7 @@ function checkout() {
     const totalFinal = subtotal + taxaEntregaAtual;
     message += `\n*Subtotal:* *R$ ${subtotal.toFixed(2).replace('.', ',')}*`;
     message += `\n*Total do Pedido:* *R$ ${totalFinal.toFixed(2).replace('.', ',')}*`;
-    message += `\n\n*----------------------------------*`;
+    message += `\n\n*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*`;
     const whatsappUrl = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 }
