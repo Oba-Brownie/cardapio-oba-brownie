@@ -59,7 +59,7 @@ header {
 /* ================================================= */
 
 .encomenda-whatsapp-container {
-    width: 109%;
+    width: 100%;
     max-width: 1000px;
     margin: 0 5px 5px 5px; /* Margem superior zerada pois o body já tem padding */
     display: flex;
@@ -90,7 +90,7 @@ header {
 }
 
 .encomenda-text {
-    width: 107%;
+    width: 100%;
     font-size: 0.7em;
     font-weight: bold;
     text-align: center;
