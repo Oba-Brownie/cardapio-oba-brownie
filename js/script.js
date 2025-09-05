@@ -180,7 +180,20 @@ function renderProducts(lojaAberta) {
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
-    if (product.estoque <= 0) { alert("Desculpe, este produto está esgotado."); return; }
+
+    const cartItem = cart.find(item => item.id === productId);
+    const quantidadeNoCarrinho = cartItem ? cartItem.quantity : 0;
+
+    // --- NOVA VERIFICAÇÃO DE ESTOQUE ---
+    if (quantidadeNoCarrinho >= product.estoque) {
+        alert(`Desculpe, você já adicionou a quantidade máxima em estoque para "${product.name}".`);
+        return;
+    }
+    
+    if (product.estoque <= 0) { 
+        alert("Desculpe, este produto está esgotado."); 
+        return; 
+    }
     
     const productCard = document.querySelector(`.product-item[data-product-id="${productId}"], .card-destaque[data-product-id="${productId}"]`);
     if (productCard) {
@@ -189,9 +202,12 @@ function addToCart(productId) {
     }
     
     showNotificacao(`"${product.name}" adicionado!`);
-    const cartItem = cart.find(item => item.id === productId);
-    if (cartItem) { cartItem.quantity++; }
-    else { cart.push({ ...product, quantity: 1 }); }
+    
+    if (cartItem) {
+        cartItem.quantity++;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
     renderCart();
 }
 
