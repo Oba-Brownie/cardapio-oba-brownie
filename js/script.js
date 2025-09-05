@@ -12,10 +12,11 @@ const CONFIG_ENTRY_ID = '2sCM9bEm5AxhgQSVXfY6pU';
 let products = [];
 let cart = [];
 let taxaEntregaAtual = 0;
+let taxaCartaoAtual = 0; // NOVA VARIÁVEL
 let notificacaoTimeout;
 let lojaForcadaFechada = false;
 
-const bairros = [ { nome: "Barra Azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil Novo (vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "IFMA", taxa: 8.00}, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do Urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da Lagoa", taxa: 8.00 }, { nome: "Parque das Nações", taxa: 10.00 }, { nome: "Parque Planalto", taxa:8.00},{ nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, { nome: "Vila Ildemar", taxa: 9.00 },{ nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila Sucuri", taxa: 6.00 }, { nome: "Vila Progresso 2", taxa: 8.00} ];
+const bairros = [ { nome: "Barra Azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil Novo (vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do Urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da Lagoa", taxa: 8.00 }, { nome: "Parque das Nações", taxa: 10.00 }, { nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, { nome: "Vila Ildemar", taxa: 9.00 },{ nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila Sucuri", taxa: 6.00 } ];
 bairros.sort((a, b) => a.nome.localeCompare(b.nome));
 bairros.unshift({ nome: "Selecione o bairro...", taxa: 0 });
 const CONTENTFUL_SPACE_ID = '2v6jjkbg0sm7', CONTENTFUL_ACCESS_TOKEN = 'rcR_gnOYLU05IPwYNhFXS2PABltFsfh-X1Flare9fds';
@@ -82,9 +83,6 @@ function renderProducts(lojaAberta) {
 
     const destaques = products.filter(p => p.destaque && p.estoque > 0);
     
-    // MODIFICAÇÃO: A linha abaixo que criava a constante 'nonDestaquesProducts' foi removida.
-    // const nonDestaquesProducts = products.filter(p => !p.destaque); 
-    
     if (destaques.length > 0 && lojaAberta) {
         destaquesContainer.style.display = 'block';
         const title = document.createElement('h3');
@@ -114,7 +112,6 @@ function renderProducts(lojaAberta) {
     }
 
     if (!lojaAberta) {
-        // MODIFICAÇÃO: A variável 'nonDestaquesProducts' foi substituída pela lista principal 'products'.
         const productsByCategory = products.reduce((acc, product) => { if (!acc[product.categoria]) acc[product.categoria] = []; acc[product.categoria].push(product); return acc; }, {});
         const categoryOrder = ['Promoções', 'Brownies', 'Bolos','Doces', 'Salgados', 'Geladinho', 'Bebidas'];
         categoryOrder.forEach(categoria => {
@@ -135,7 +132,6 @@ function renderProducts(lojaAberta) {
         return;
     }
     
-    // MODIFICAÇÃO: Ambas as constantes abaixo agora filtram a partir da lista principal 'products'.
     const availableProducts = products.filter(p => p.estoque > 0);
     const soldOutProducts = products.filter(p => p.estoque <= 0);
 
@@ -180,6 +176,7 @@ function renderProducts(lojaAberta) {
         });
     }
 }
+
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
@@ -230,53 +227,141 @@ function removeFromCart(productId) {
     renderCart();
 }
 
-function updateCartTotal() {
-    const subtotalCart = document.getElementById('subtotal-cart');
-    const taxaEntregaCart = document.getElementById('taxa-entrega-cart');
-    const cartTotal = document.getElementById('cart-total');
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const totalFinal = subtotal + taxaEntregaAtual;
-    subtotalCart.innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-    taxaEntregaCart.innerText = `R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}`;
-    cartTotal.innerText = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
+// NOVA FUNÇÃO PARA CALCULAR TAXA DO CARTÃO
+function calculateCardFee(subtotal, paymentMethod) {
+    if (paymentMethod === 'Cartão de Crédito') {
+        if (subtotal >= 70) return 3.00;
+        if (subtotal >= 50) return 2.00;
+        if (subtotal >= 30) return 1.00;
+    }
+    if (paymentMethod === 'Cartão de Débito') {
+        if (subtotal >= 100) return 3.00;
+        if (subtotal >= 70) return 2.00;
+        if (subtotal >= 50) return 1.00;
+    }
+    return 0; // Nenhuma taxa para outros métodos ou valores abaixo
 }
 
-function checkout() {
+// FUNÇÃO ATUALIZADA PARA LIDAR COM TODOS OS TOTAIS
+function updateCartTotal() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const paymentMethod = document.getElementById('payment-method').value;
+
+    // --- INÍCIO DA CORREÇÃO ---
+    // Soma o subtotal e a entrega ANTES de calcular a taxa do cartão
+    const valorParaTaxa = subtotal + taxaEntregaAtual;
+    // Calcula a taxa do cartão com base no valor correto
+    taxaCartaoAtual = calculateCardFee(valorParaTaxa, paymentMethod);
+    // --- FIM DA CORREÇÃO ---
+    
+    const totalFinal = subtotal + taxaEntregaAtual + taxaCartaoAtual;
+
+    document.getElementById('subtotal-cart').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+    document.getElementById('taxa-entrega-cart').innerText = `R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}`;
+    document.getElementById('cart-total').innerText = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
+    
+    const cardFeeLine = document.getElementById('card-fee-line');
+    const cardFeeCart = document.getElementById('card-fee-cart');
+    
+    if (taxaCartaoAtual > 0) {
+        cardFeeCart.innerText = `R$ ${taxaCartaoAtual.toFixed(2).replace('.', ',')}`;
+        cardFeeLine.style.display = 'flex';
+    } else {
+        cardFeeLine.style.display = 'none';
+    }
+}
+// FUNÇÃO DE CHECKOUT ATUALIZADA
+async function checkout() {
+    const deliveryType = document.querySelector('input[name="delivery_type"]:checked').value;
     const name = document.getElementById('customer-name').value;
     const phone = document.getElementById('customer-phone').value;
-    const address = document.getElementById('customer-address').value;
-    const reference = document.getElementById('customer-reference').value;
     const observation = document.getElementById('customer-observation').value;
     const paymentMethod = document.getElementById('payment-method').value;
     const trocoPara = document.getElementById('troco-para').value;
-    const bairroSelect = document.getElementById('bairro-select');
-    const bairroNome = bairroSelect.value;
-    if (cart.length === 0) { alert("Seu carrinho está vazio!"); return; }
-    if (!name || !address || !paymentMethod || !bairroSelect.value || bairroSelect.value === "Selecione o bairro...") {
-        alert("Por favor, preencha seu nome, endereço, bairro e forma de pagamento.");
+    
+    if (cart.length === 0) {
+        alert("Seu carrinho está vazio!");
         return;
     }
-    const displayName = name.trim().split(' ').slice(0, 2).join(' ');
-    const numeroWhatsapp = '5599991675891';
-    let message = `*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*\n\n`;
-    message += `*•••  PEDIDO ${displayName}  •••*\n\n\n`;
-    message += `*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n`;
-    if (reference) { message += `*PONTO DE REFERÊNCIA:* *${reference.trim()}*\n`; }
-    message += `\n*VALOR DA ENTREGA:* *R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}*\n\n`;
-    message += `*PAGAMENTO:* *${paymentMethod}*`;
-    if (paymentMethod === 'Dinheiro' && trocoPara) { message += ` *(Troco para R$ ${trocoPara})*`; }
-    message += `\n`;
-    if (phone) { message += `\n*TELEFONE:* *${phone}*\n`; }
-    if (observation) { message += `\n*OBSERVAÇÃO:* *${observation.trim()}*\n`; }
-    message += `\n--- *ITENS DO PEDIDO* ---\n`;
-    cart.forEach(item => { message += `*${item.quantity}x ${item.name}* - *R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}*\n`; });
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const totalFinal = subtotal + taxaEntregaAtual;
-    message += `\n*Subtotal:* *R$ ${subtotal.toFixed(2).replace('.', ',')}*`;
-    message += `\n*Total do Pedido:* *R$ ${totalFinal.toFixed(2).replace('.', ',')}*`;
-    message += `\n\n*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*`;
-    const whatsappUrl = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    if (!name || !paymentMethod) {
+        alert("Por favor, preencha seu nome e a forma de pagamento.");
+        return;
+    }
+
+    const address = document.getElementById('customer-address').value;
+    const bairroSelect = document.getElementById('bairro-select');
+    const bairroNome = bairroSelect.value;
+    const reference = document.getElementById('customer-reference').value;
+    
+    if (deliveryType === 'delivery' && (!address || bairroSelect.value === "Selecione o bairro...")) {
+        alert("Para delivery, por favor, preencha o bairro e o endereço.");
+        return;
+    }
+
+    const checkoutButton = document.querySelector('.final-checkout-button-container button');
+    checkoutButton.disabled = true;
+    checkoutButton.textContent = 'Processando...';
+
+    try {
+        // ESTA É A URL DE PRODUÇÃO QUE CONECTA COM SEU BACK-END NA VERCEL
+        const apiUrl = 'https://oba-brownie-api.vercel.app/api/dar-baixa-estoque';
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(cart)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Não foi possível processar o pedido. Tente novamente.');
+        }
+
+        // Se a baixa de estoque funcionou, o código continua para montar a mensagem
+        const displayName = name.trim().split(' ').slice(0, 2).join(' ');
+        const numeroWhatsapp = '5599991675891';
+        let message = `*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*\n\n`;
+        message += `*•••  PEDIDO ${displayName}  •••*\n\n`;
+
+        if (deliveryType === 'pickup') {
+            message += `*TIPO:* *RETIRADA NO LOCAL*\n`;
+        } else {
+            message += `*TIPO:* *DELIVERY*\n`;
+            message += `*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n`;
+            if (reference) { message += `*PONTO DE REFERÊNCIA:* *${reference.trim()}*\n`; }
+            message += `\n*VALOR DA ENTREGA:* *R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}*\n`;
+        }
+
+        message += `\n*PAGAMENTO:* *${paymentMethod}*`;
+        if (paymentMethod === 'Dinheiro' && trocoPara) { message += ` *(Troco para R$ ${trocoPara})*`; }
+        message += `\n`;
+        if (phone) { message += `\n*TELEFONE:* *${phone}*\n`; }
+        if (observation) { message += `\n*OBSERVAÇÃO:* *${observation.trim()}*\n`; }
+        message += `\n--- *ITENS DO PEDIDO* ---\n`;
+        cart.forEach(item => { message += `*${item.quantity}x ${item.name}* - *R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}*\n`; });
+        
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        message += `\n*Subtotal:* *R$ ${subtotal.toFixed(2).replace('.', ',')}*`;
+        
+        if (taxaCartaoAtual > 0) {
+            message += `\n*Taxa da Maquininha:* *R$ ${taxaCartaoAtual.toFixed(2).replace('.', ',')}*`;
+        }
+        
+        const totalFinal = subtotal + taxaEntregaAtual + taxaCartaoAtual;
+        message += `\n*Total do Pedido:* *R$ ${totalFinal.toFixed(2).replace('.', ',')}*`;
+        message += `\n\n*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*`;
+        
+        const whatsappUrl = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(message)}`;
+        
+        window.location.href = whatsappUrl;
+
+    } catch (error) {
+        alert(error.message);
+        checkoutButton.disabled = false;
+        checkoutButton.textContent = 'Finalizar Pedido no WhatsApp';
+    }
 }
 
 function openPixPopup() { document.getElementById('pix-popup').style.display = 'flex'; }
@@ -345,6 +430,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         taxaEntregaAtual = bairroSelecionado ? bairroSelecionado.taxa : 0;
         updateCartTotal();
     });
+
     checkoutButton.addEventListener('click', checkout);
     const paymentMethodSelect = document.getElementById('payment-method');
     const trocoSection = document.getElementById('troco-section');
@@ -352,6 +438,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const taxaInfoBox = document.getElementById('taxa-info');
     const infoTaxaCredito = "No cartão de crédito cobramos taxa:\nA partir de R$30,00, acrescenta-se R$1,00.\nA partir de R$50,00, acrescenta-se R$2,00.\nA partir de R$70,00, acrescenta-se R$3,00.";
     const infoTaxaDebito = "No cartão de débito cobramos taxa:\nA partir de R$50,00, acrescenta-se R$1,00.\nA partir de R$70,00, acrescenta-se R$2,00.\nA partir de R$100,00, acrescenta-se R$3,00.";
+    
     paymentMethodSelect.addEventListener('change', (event) => {
         const selectedValue = event.target.value;
         if (selectedValue === 'Pix') { openPixPopup(); }
@@ -360,12 +447,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (selectedValue === 'Cartão de Crédito') { taxaInfoBox.innerText = infoTaxaCredito; taxaInfoBox.style.display = 'block'; }
         else if (selectedValue === 'Cartão de Débito') { taxaInfoBox.innerText = infoTaxaDebito; taxaInfoBox.style.display = 'block'; }
         else { taxaInfoBox.style.display = 'none'; taxaInfoBox.innerText = ''; }
+        updateCartTotal(); // Recalcula o total para aplicar ou remover a taxa do cartão
     });
+    
     trocoInput.addEventListener('input', function() { this.value = this.value.replace(/[^0-9.,]/g, ''); });
     const pixPopup = document.getElementById('pix-popup');
     pixPopup.addEventListener('click', function(event) { if (event.target === this) { closePixPopup(); } });
     const carrinhoFlutuante = document.getElementById('carrinho-flutuante');
     carrinhoFlutuante.addEventListener('click', () => { document.querySelector('.checkout-area').scrollIntoView({ behavior: 'smooth' }); });
+
+    // LÓGICA PARA AS OPÇÕES DE DELIVERY E RETIRADA
+    const deliveryFields = document.getElementById('delivery-fields');
+    const pickupAddressInfo = document.getElementById('pickup-address-info');
+    const deliveryFeeLine = document.getElementById('delivery-fee-line');
+
+    document.querySelectorAll('input[name="delivery_type"]').forEach(radio => {
+        radio.addEventListener('change', (event) => {
+            if (event.target.value === 'pickup') {
+                deliveryFields.style.display = 'none';
+                pickupAddressInfo.style.display = 'block';
+                deliveryFeeLine.style.display = 'none';
+                taxaEntregaAtual = 0;
+                bairroSelect.selectedIndex = 0; // Reseta a seleção de bairro
+            } else { // 'delivery'
+                deliveryFields.style.display = 'block';
+                pickupAddressInfo.style.display = 'none';
+                deliveryFeeLine.style.display = 'flex';
+                // Recalcula a taxa caso um bairro já estivesse selecionado
+                const bairroSelecionado = bairros.find(b => b.nome === bairroSelect.value);
+                taxaEntregaAtual = bairroSelecionado ? bairroSelecionado.taxa : 0;
+            }
+            updateCartTotal();
+        });
+    });
+
     renderCart();
     fetchProducts(lojaAberta);
 });
