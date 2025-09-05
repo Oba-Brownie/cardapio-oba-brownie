@@ -116,6 +116,43 @@ header {
     vertical-align: middle;
 }
 
+/* ================================================= */
+/* ESTILOS ADICIONAIS PARA OPÇÕES DE ENTREGA */
+/* ================================================= */
+
+.delivery-options {
+    display: flex;
+    gap: 20px;
+    background-color: #fdf6f8;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #FADADD;
+}
+
+.delivery-options label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal !important; /* Sobrescreve o negrito do label geral */
+}
+
+.delivery-options input[type="radio"] {
+    margin-right: 8px;
+}
+
+.pickup-address-info {
+    background-color: #fdf6f8;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #FADADD;
+    font-size: 0.9em;
+    color: #a33e6b;
+    line-height: 1.5;
+}
+
+.pickup-address-info p {
+    margin: 0;
+}
 /* O resto do seu CSS continua aqui */
 main { width: 90%; max-width: 1000px; margin: 0 auto 25px auto; padding: 15px; box-sizing: border-box; }
 .aviso-loja-fechada { display: none; background-color: #FADADD; border: 2px solid #F8B4CB; color: #a33e6b; text-align: center; padding: 15px; border-radius: 10px; margin-bottom: 25px; }
