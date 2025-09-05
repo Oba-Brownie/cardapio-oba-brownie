@@ -50,9 +50,13 @@
                     <span>Subtotal:</span>
                     <span id="subtotal-cart">R$ 0,00</span>
                 </div>
-                <div class="total-line">
+                <div class="total-line" id="delivery-fee-line">
                     <span>Taxa de Entrega:</span>
                     <span id="taxa-entrega-cart">R$ 0,00</span>
+                </div>
+                <div class="total-line" id="card-fee-line" style="display: none;">
+                    <span>Taxa da Maquininha:</span>
+                    <span id="card-fee-cart">R$ 0,00</span>
                 </div>
                 <div class="total-line final-total">
                     <span>Total:</span>
@@ -71,18 +75,41 @@
                 <label for="customer-phone">Seu WhatsApp</label>
                 <input type="tel" id="customer-phone" placeholder="(99) 99999-9999">
             </div>
+
             <div class="form-group">
-                <label for="bairro-select">Bairro para Entrega</label>
-                <select id="bairro-select"></select>
+                <label>Tipo de Entrega</label>
+                <div class="delivery-options">
+                    <label for="delivery-option">
+                        <input type="radio" id="delivery-option" name="delivery_type" value="delivery" checked>
+                        Delivery
+                    </label>
+                    <label for="pickup-option">
+                        <input type="radio" id="pickup-option" name="delivery_type" value="pickup">
+                        Retirada no Local
+                    </label>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="customer-address">Endereço (Rua e Número)</label>
-                <input type="text" id="customer-address" placeholder="Ex: Rua das Flores, 123">
+
+            <div id="pickup-address-info" class="pickup-address-info" style="display: none;">
+                <p><strong>Endereço para Retirada:</strong></p>
+                <p>Rua Betim Q11 L14<br>Porto Seguro II</p>
             </div>
-            <div class="form-group">
-                <label for="customer-reference">Ponto de Referência (Opcional)</label>
-                <input type="text" id="customer-reference" placeholder="Ex: Próximo ao mercado, casa azul">
+
+            <div id="delivery-fields">
+                <div class="form-group">
+                    <label for="bairro-select">Bairro para Entrega</label>
+                    <select id="bairro-select"></select>
+                </div>
+                <div class="form-group">
+                    <label for="customer-address">Endereço (Rua e Número)</label>
+                    <input type="text" id="customer-address" placeholder="Ex: Rua das Flores, 123">
+                </div>
+                <div class="form-group">
+                    <label for="customer-reference">Ponto de Referência (Opcional)</label>
+                    <input type="text" id="customer-reference" placeholder="Ex: Próximo ao mercado, casa azul">
+                </div>
             </div>
+
             <div class="form-group">
                 <label for="customer-observation">Observação (Opcional)</label>
                 <textarea id="customer-observation" rows="6" placeholder="Informações para o pedido, ex: Caso seja para outra pessoa, informe o nome de quem irá receber."></textarea>
