@@ -231,9 +231,21 @@ function renderCart() {
 function updateQuantity(productId, newQuantity) {
     const quantity = parseInt(newQuantity);
     const cartItem = cart.find(item => item.id === productId);
-    if (cartItem) {
-        if (quantity > 0) { cartItem.quantity = quantity; }
-        else { removeFromCart(productId); return; }
+    const product = products.find(p => p.id === productId);
+
+    if (cartItem && product) {
+        // --- NOVA VERIFICAÇÃO DE ESTOQUE ---
+        if (quantity > product.estoque) {
+            alert(`Estoque insuficiente para "${product.name}". Apenas ${product.estoque} unidades disponíveis.`);
+            // Corrige o valor no input para o máximo disponível
+            document.getElementById(`quantity-${item.id}`).value = product.estoque;
+            cartItem.quantity = product.estoque;
+        } else if (quantity > 0) {
+            cartItem.quantity = quantity;
+        } else {
+            removeFromCart(productId);
+            return;
+        }
     }
     renderCart();
 }
