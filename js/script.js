@@ -304,7 +304,7 @@ async function checkout() {
 
     try {
         // ESTA É A URL DE PRODUÇÃO QUE CONECTA COM SEU BACK-END NA VERCEL
-        const apiUrl = 'https://oba-brownie-api.vercel.app/';
+        const apiUrl = 'https://oba-brownie-api.vercel.app/api/dar-baixa-estoque';
 
         const response = await fetch(apiUrl, {
             method: 'POST',
