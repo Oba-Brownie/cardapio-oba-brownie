@@ -9,7 +9,7 @@
 body { 
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
     margin: 0; 
-    padding-top: 55px; /* AUMENTADO: Dá mais espaço para a logo "vazar" para o conteúdo */
+    padding-top: 55px;
     background-color: #fdf6f8;
     overflow-x: hidden; 
 }
@@ -27,24 +27,11 @@ header {
     top: 0;
     z-index: 1000;
     display: flex;
-    align-items: center; /* Mantém o alinhamento central */
+    align-items: center;
     justify-content: center;
     padding: 0 20px;
     box-sizing: border-box;
     border-bottom: 1px solid #F8B4CB;
-}
-
-.header-content {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.header-logo-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
 }
 
 .header-logo-small { 
@@ -55,66 +42,75 @@ header {
 }
 
 /* ================================================= */
-/* BOTÃO DE ENCOMENDAS (ACIMA DOS DESTAQUES) */
+/* NOVA SEÇÃO DE TOPO (COM IMAGENS E BOTÃO) */
 /* ================================================= */
 
-.encomenda-whatsapp-container {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 5px 5px 5px; /* Margem superior zerada pois o body já tem padding */
+.top-info-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 0px;
     box-sizing: border-box;
-    padding: 0 15px 0 0;
+    margin-bottom: 15px;
 }
 
-.encomenda-button {
+.left-info, .right-info {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #F86DB3;
-    border-radius: 4px;
-    padding: 8px 15px ;
-    text-decoration: none;
-    color: #a33e6b;
-    font-weight: bold;
-    text-align: center;
-    transition: transform 0.2s, background-color 0.2s;
-    line-height: 1.3;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
 }
 
-.encomenda-button:hover {
-    transform: translateY(-3px);
-    background-color: #F86DB3;
+.left-info {
+    align-items: flex-start;
+    flex-basis: 45%;
 }
 
-.encomenda-text {
+.right-info {
+    align-items: flex-end;
+    flex-basis: 35%;
+}
+
+.info-image-left {
     width: 100%;
-    font-size: 0.7em;
-    font-weight: bold;
-    text-align: center;
-    color: #ec968f;
-    max-width: 1000px;
-    margin: 0 5px 0 5px; /* Margem superior zerada pois o body já tem padding */
+    max-width: 180px;
+    height: auto;
+    margin-top: 30px;
+}
+
+.info-image-right {
+    width: 100%;
+    max-width: 200px;
+}
+.encomenda-button {
     display: flex;
-    justify-content: flex-end;
-    box-sizing: border-box;
-    padding: 8px 15px ;
+    align-items: center;
+    justify-content: center;
+    background-color: #F86DB3;
+    border-radius: 8px;
+    padding: 8px 15px;
+    text-decoration: none;
+    transition: transform 0.2s, background-color 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    width: auto;
+    margin-right: 10px;
+    margin-top: -20px;
 }
 
 .whatsapp-label {
     display: flex;
     align-items: center;
     color: #ffffff;
-    font-size: 0.8em;
+    font-size: 0.9em;
+    font-weight: bold;
 }
 
 .whatsapp-icon-image {
     width: 18px;
     height: 18px;
-    vertical-align: middle;
+    margin-right: 8px;
 }
+
 
 /* ================================================= */
 /* ESTILOS ADICIONAIS PARA OPÇÕES DE ENTREGA */
@@ -133,7 +129,7 @@ header {
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-weight: normal !important; /* Sobrescreve o negrito do label geral */
+    font-weight: normal !important;
 }
 
 .delivery-options input[type="radio"] {
