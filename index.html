@@ -74,6 +74,18 @@
 
         <div class="customer-details">
             <h2>Seus Dados</h2>
+            
+            <div id="scheduling-info-box" class="scheduling-info-box" style="display: none;">
+                <p><strong>Data do Pedido:</strong> <span id="next-day-date"></span></p>
+                <p>Seu pedido agendado só será confirmado após o envio do comprovante de pagamento via Pix.</p>
+            </div>
+
+            <div id="scheduling-time-box" class="form-group" style="display: none;">
+                <label for="scheduling-time-select">Horário para Entrega/Retirada (Amanhã)</label>
+                <select id="scheduling-time-select">
+                    </select>
+            </div>
+
             <div class="form-group">
                 <label for="customer-name">Nome Completo</label>
                 <input type="text" id="customer-name" placeholder="Digite seu nome">
@@ -140,7 +152,7 @@
     </section>
 
     <div class="final-checkout-button-container">
-        <button id="checkout-button">Finalizar Pedido no WhatsApp</button>
+        <button id="checkout-button">Enviar Pedido no WhatsApp</button>
     </div>
 
     <div id="pix-popup" class="pix-popup-overlay">
