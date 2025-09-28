@@ -224,3 +224,49 @@ h2 { color: #a33e6b; text-align: center; font-size: 1.5em; margin-top: 0; }
 .notificacao-carrinho::after { content: ''; position: absolute; bottom: -8px; right: 20px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #ffffff; }
 .product-item.flash-success, .card-destaque.flash-success { animation: flash 0.7s ease-out; }
 @keyframes flash { 0% { transform: scale(1); } 50% { transform: scale(1.03); box-shadow: 0 4px 15px rgba(0,0,0,0.12); } 100% { transform: scale(1); } }
+
+/* NOVOS ESTILOS PARA AGENDAMENTO */
+.schedule-order-button {
+    background-color: #a33e6b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    display: inline-block;
+    transition: background-color 0.2s;
+}
+.schedule-order-button:hover {
+    background-color: #8a335a;
+}
+.scheduling-notice {
+    background-color: #fffbe6;
+    border: 1px solid #ffe58f;
+    color: #b38200;
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    margin-top: 25px;
+}
+.scheduling-notice p {
+    margin: 0;
+    font-weight: bold;
+}
+
+/* ESTILO PARA A CAIXA DE INFORMAÇÕES DE AGENDAMENTO */
+.scheduling-info-box {
+    background-color: #fdf6f8;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #FADADD;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+    color: #a33e6b;
+    line-height: 1.5;
+}
+.scheduling-info-box p {
+    margin: 5px 0;
+}
