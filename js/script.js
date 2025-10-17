@@ -16,7 +16,7 @@ let taxaCartaoAtual = 0;
 let notificacaoTimeout;
 let lojaForcadaFechada = false;
 
-const bairros = [ { nome: "Barra Azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil Novo (vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "IFMA", taxa:8.00}, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do Urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da Lagoa", taxa: 8.00 }, { nome: "Parque das Nações", taxa: 10.00 }, {nome: "Parque Planalto", taxa:9.00 }, {nome: "Pequiá", taxa: 18.00}, {nome: "Plano da Serra", taxa: 18.00}, { nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, { nome: "Vila Ildemar", taxa: 9.00 },{ nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila Sucuri", taxa: 6.00 } ];
+const bairros = [ { nome: "Barra Azul", taxa: 5.00 }, { nome: "Baixão(depois do teatro)", taxa: 8.00 }, { nome: "Bairro Matadouro", taxa: 4.00 }, { nome: "Bom Jardim", taxa: 7.00 }, { nome: "Brasil Novo (vila Ildemar)", taxa: 9.00 }, { nome: "Capeloza", taxa: 7.00 }, { nome: "Centro", taxa: 5.00 }, { nome: "Colinas Park", taxa: 3.00 }, { nome: "Getat", taxa: 6.00 }, { nome: "Jacu", taxa: 6.00 }, { nome: "Jardim América", taxa: 8.00 }, { nome: "Jardim Aulidia", taxa: 12.00 }, { nome: "Jardim de Alah", taxa: 7.00 }, { nome: "Jardim Glória I", taxa: 7.00 }, { nome: "Jardim Glória II", taxa: 7.00 }, { nome: "Jardim Glória III", taxa: 7.00 }, { nome: "Jardim Gloria City", taxa: 8.00 }, { nome: "Laranjeiras", taxa: 6.00 }, { nome: "Leolar", taxa: 6.00 }, { nome: "Morro do Urubu", taxa: 10.00 }, { nome: "Nova Açailândia I", taxa: 7.00 }, { nome: "Nova Açailândia II", taxa: 7.00 }, { nome: "Ouro Verde", taxa: 8.00 }, { nome: "Parque da Lagoa", taxa: 8.00 }, { nome: "Parque das Nações", taxa: 10.00 }, { nome: "Porto Belo", taxa: 3.00 }, { nome: "Porto Seguro I", taxa: 3.00 }, { nome: "Porto Seguro II", taxa: 3.00 }, { nome: "Residencial tropical", taxa: 8.00 }, { nome: "Tancredo", taxa: 7.00 }, { nome: "Vale do Açai", taxa: 15.00 }, { nome: "Vila Flávio Dino", taxa: 6.00 }, { nome: "Vila Ildemar", taxa: 9.00 },{ nome: "Vila Maranhão", taxa: 6.00 }, { nome: "Vila São Francisco", taxa: 8.00 }, { nome: "Vila Sucuri", taxa: 6.00 } ];
 bairros.sort((a, b) => a.nome.localeCompare(b.nome));
 bairros.unshift({ nome: "Selecione o bairro...", taxa: 0 });
 const CONTENTFUL_SPACE_ID = '2v6jjkbg0sm7', CONTENTFUL_ACCESS_TOKEN = 'rcR_gnOYLU05IPwYNhFXS2PABltFsfh-X1Flare9fds';
@@ -180,8 +180,21 @@ function renderProducts(lojaAberta) {
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
-    if (product.estoque <= 0) { alert("Desculpe, este produto está esgotado."); return; }
+    if (product.estoque <= 0) { 
+        showNotificacao("Desculpe, este produto está esgotado."); 
+        return; 
+    }
     
+    const cartItem = cart.find(item => item.id === productId);
+
+    // Verifica se a quantidade no carrinho + 1 excede o estoque
+    if (cartItem && cartItem.quantity >= product.estoque) {
+        // --- ESTA É A LINHA QUE FOI ALTERADA ---
+        const plural = product.estoque > 1 ? 'disponíveis' : 'disponível';
+        showNotificacao(`Temos apenas ${product.estoque} unidades de "${product.name}" ${plural}.`);
+        return;
+    }
+
     const productCard = document.querySelector(`.product-item[data-product-id="${productId}"], .card-destaque[data-product-id="${productId}"]`);
     if (productCard) {
         productCard.classList.add('flash-success');
@@ -189,9 +202,12 @@ function addToCart(productId) {
     }
     
     showNotificacao(`"${product.name}" adicionado!`);
-    const cartItem = cart.find(item => item.id === productId);
-    if (cartItem) { cartItem.quantity++; }
-    else { cart.push({ ...product, quantity: 1 }); }
+    
+    if (cartItem) { 
+        cartItem.quantity++; 
+    } else { 
+        cart.push({ ...product, quantity: 1 }); 
+    }
     renderCart();
 }
 
@@ -213,11 +229,24 @@ function renderCart() {
 }
 
 function updateQuantity(productId, newQuantity) {
-    const quantity = parseInt(newQuantity);
+    let quantity = parseInt(newQuantity);
     const cartItem = cart.find(item => item.id === productId);
-    if (cartItem) {
-        if (quantity > 0) { cartItem.quantity = quantity; }
-        else { removeFromCart(productId); return; }
+    const product = products.find(p => p.id === productId); // Precisamos dos dados do produto original
+
+    if (cartItem && product) {
+        if (quantity > 0) {
+            // Verifica se a quantidade desejada é maior que o estoque
+            if (quantity > product.estoque) {
+                showNotificacao(`Estoque insuficiente! Apenas ${product.estoque} unidades de "${product.name}" disponíveis.`);
+                quantity = product.estoque; // Ajusta a quantidade para o máximo em estoque
+                cartItem.quantity = quantity;
+            } else {
+                cartItem.quantity = quantity;
+            }
+        } else {
+            removeFromCart(productId);
+            return;
+        }
     }
     renderCart();
 }
@@ -400,7 +429,7 @@ function showNotificacao(mensagem) {
     notificacao.textContent = mensagem;
     notificacao.classList.add('visible');
     clearTimeout(notificacaoTimeout);
-    notificacaoTimeout = setTimeout(() => { notificacao.classList.remove('visible'); }, 3000);
+    notificacaoTimeout = setTimeout(() => { notificacao.classList.remove('visible'); }, 5000);
 }
 
 function updateContadorCarrinho() {
