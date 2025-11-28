@@ -24,7 +24,7 @@ export const DADOS_LOJA = {
 // Lista bruta original
 const RAW_BAIRROS = [ 
     { nome: "Barra Azul", taxa: 5.00 }, 
-    { nome: "Baixão(depois do teatro)", taxa: 8.00 }, 
+    { nome: "Baixão(depois do teatro)", taxa: 9.00 }, 
     { nome: "Bairro Matadouro", taxa: 4.00 }, 
     { nome: "Bom Jardim", taxa: 7.00 }, 
     { nome: "Brasil Novo (vila Ildemar)", taxa: 9.00 }, 
