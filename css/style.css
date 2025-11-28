@@ -291,3 +291,45 @@ h2 { color: #a33e6b; text-align: center; font-size: 1.5em; margin-top: 0; }
 .scheduling-info-box p {
     margin: 5px 0;
 }
+
+/* Botão Black Friday no Header - Versão Final */
+.btn-black-friday {
+    background-color: #000000;
+    color: #ffffff;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 50px;
+    border: 2px solid #ffffff;
+    position: absolute;
+    right: 15px; /* Fica sempre à direita */
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    animation: pulse-black 1.5s infinite;
+    z-index: 1100;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    white-space: nowrap; /* Garante que o texto não quebre */
+}
+
+.btn-black-friday:hover {
+    background-color: #333333;
+    transform: translateY(-50%) scale(1.05);
+}
+
+@keyframes pulse-black {
+    0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7); }
+    70% { box-shadow: 0 0 0 8px rgba(0, 0, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+}
+
+/* Ajuste apenas de tamanho para celulares, mantendo no TOPO */
+@media (max-width: 480px) {
+    .btn-black-friday {
+        padding: 6px 10px;
+        font-size: 0.7em; /* Letra menor para caber */
+        right: 10px;
+        border-width: 1px;
+    }
+}
