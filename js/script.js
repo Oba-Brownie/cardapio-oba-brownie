@@ -16,6 +16,9 @@ let taxaCartaoAtual = 0;
 let notificacaoTimeout;
 let lojaForcadaFechada = false;
 
+// Verifica se o nome do arquivo na URL contém "blackfriday"
+const IS_BLACK_FRIDAY = window.location.pathname.includes('blackfriday') || window.location.href.includes('blackfriday');
+let valorFreteFinal = 0; // Variável para armazenar o frete real a ser cobrado
 const bairros = [ 
     { nome: "Barra Azul", taxa: 5.00 }, 
     { nome: "Baixão(depois do teatro)", taxa: 8.00 }, 
@@ -42,8 +45,7 @@ const bairros = [
     { nome: "Ouro Verde", taxa: 8.00 }, 
     { nome: "Parque da Lagoa", taxa: 8.00 }, 
     { nome: "Parque das Nações", taxa: 10.00 }, 
-    { nome: "Parque Planalto", taxa:8.00},
-    { nome: "Pequiá", taxa:20.00},
+    { nome: "Parque Planalto", taxa:8.00}, 
     { nome: "Porto Belo", taxa: 3.00 }, 
     { nome: "Porto Seguro I", taxa: 3.00 }, 
     { nome: "Porto Seguro II", taxa: 3.00 }, 
@@ -87,6 +89,10 @@ function lojaEstaAberta(){
 
 async function fetchProducts(lojaAberta) {
     const url = `https://cdn.contentful.com/spaces/${CONTENTFUL_SPACE_ID}/environments/master/entries?access_token=${CONTENTFUL_ACCESS_TOKEN}&content_type=obaBrownie&order=fields.ordem`;
+    
+    console.log("--- INICIANDO BUSCA DE PRODUTOS ---");
+    console.log("Modo Black Friday Ativo?", IS_BLACK_FRIDAY);
+
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error('Falha ao carregar os produtos.');
@@ -94,27 +100,72 @@ async function fetchProducts(lojaAberta) {
         const assets = data.includes?.Asset || [];
         
         products = data.items.map(item => {
-            const originalPrice = item.fields.preco;
-            const promoPrice = item.fields.precoPromocional;
-            const onSale = promoPrice && promoPrice > 0;
+            // Campos padrões
+            let originalPrice = item.fields.preco;
+            let currentPrice = item.fields.preco;
+            let promoPrice = item.fields.precoPromocional;
+            const isPromo = promoPrice && promoPrice > 0;
+            
+            // --- CORREÇÃO DE SEGURANÇA PARA IDS ---
+            // Tenta ler 'blackfriday' (minúsculo) OU 'blackFriday' (camelCase)
+            // O Contentful às vezes gera IDs diferentes do que imaginamos.
+            const fieldBlackFriday = item.fields.blackfriday || item.fields.blackFriday; 
+            const fieldValorBlackFriday = item.fields.valorBlackFriday || item.fields.ValorBlackFriday;
+
+            const isBFProduct = fieldBlackFriday === true;
+            const bfPrice = fieldValorBlackFriday;
+
+            // === LÓGICA DE PREÇOS ===
+            if (IS_BLACK_FRIDAY) {
+                // Se estamos na página Black Friday:
+                if (bfPrice && bfPrice > 0) {
+                    currentPrice = bfPrice;
+                    originalPrice = item.fields.preco; 
+                }
+            } else {
+                // Página normal (index.html)
+                if (isPromo) {
+                    currentPrice = promoPrice;
+                }
+            }
 
             return {
                 id: item.sys.id,
                 name: item.fields.nome,
                 description: item.fields.descricao,
-                price: onSale ? promoPrice : originalPrice,
-                originalPrice: onSale ? originalPrice : null,
+                price: currentPrice,
+                // Define se mostra o preço riscado
+                originalPrice: (IS_BLACK_FRIDAY && bfPrice) ? item.fields.preco : (isPromo ? item.fields.preco : null),
                 image: `https:${assets.find(asset => asset.sys.id === item.fields.imagem?.sys?.id)?.fields.file.url || '//placehold.co/400x400/ccc/999?text=Sem+Imagem'}`,
                 categoria: item.fields.categoria,
                 estoque: item.fields.estoque ?? 0,
                 destaque: item.fields.destaque ?? false,
-                oculto: item.fields.oculto ?? false // <-- LINHA ADICIONADA
+                oculto: item.fields.oculto ?? false,
+                isBlackFriday: isBFProduct // Guarda a flag
             };
         })
-        .filter(product => !product.oculto); // <-- LINHA ADICIONADA
+        .filter(product => !product.oculto);
+
+        console.log(`Total de produtos carregados (antes do filtro BF): ${products.length}`);
+
+        // === FILTRO DA BLACK FRIDAY ===
+        if (IS_BLACK_FRIDAY) {
+            // Filtra apenas produtos marcados com o checkbox
+            products = products.filter(p => p.isBlackFriday === true);
+            console.log(`Total de produtos APÓS filtro BF: ${products.length}`);
+            
+            if (products.length === 0) {
+                console.warn("ALERTA: Nenhum produto marcado como 'Black Friday' foi encontrado.");
+                document.getElementById('product-list').innerHTML = `<p style="text-align: center; color: white; padding: 20px;">Nenhum produto em oferta encontrado no momento.<br>Verifique se os produtos estão marcados no painel.</p>`;
+                return;
+            }
+        }
 
         renderProducts(lojaAberta);
-    } catch (error) { console.error("Erro ao buscar produtos:", error); document.getElementById('product-list').innerHTML = `<p style="text-align: center; color: red;">Não foi possível carregar o cardápio. Tente novamente mais tarde.</p>`; }
+    } catch (error) { 
+        console.error("Erro ao buscar produtos:", error); 
+        document.getElementById('product-list').innerHTML = `<p style="text-align: center; color: red;">Não foi possível carregar o cardápio. Tente novamente mais tarde.</p>`; 
+    }
 }
 
 function renderProducts(lojaAberta) {
@@ -311,12 +362,29 @@ function calculateCardFee(subtotal, paymentMethod) {
 function updateCartTotal() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const paymentMethod = document.getElementById('payment-method').value;
-    const valorParaTaxa = subtotal + taxaEntregaAtual;
+    
+    // === LÓGICA DO FRETE GRÁTIS BLACK FRIDAY ===
+    // Começa com o valor normal do bairro
+    valorFreteFinal = taxaEntregaAtual;
+    let textoFrete = `R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}`;
+    let isFreteGratis = false;
+
+    // Regra: Página BF + Subtotal >= 60 + Taxa do Bairro <= 7 + Taxa não pode ser 0 (retirada)
+    if (IS_BLACK_FRIDAY && subtotal >= 60.00 && taxaEntregaAtual > 0 && taxaEntregaAtual <= 7.00) {
+        valorFreteFinal = 0;
+        textoFrete = `<span style="text-decoration: line-through; color: #777; font-size: 0.8em; margin-right: 5px;">R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}</span> <span style="color: #FFD700; font-weight: bold;">GRÁTIS</span>`;
+        isFreteGratis = true;
+    }
+
+    const valorParaTaxa = subtotal + valorFreteFinal;
     taxaCartaoAtual = calculateCardFee(valorParaTaxa, paymentMethod);
-    const totalFinal = subtotal + taxaEntregaAtual + taxaCartaoAtual;
+    const totalFinal = subtotal + valorFreteFinal + taxaCartaoAtual;
 
     document.getElementById('subtotal-cart').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-    document.getElementById('taxa-entrega-cart').innerText = `R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}`;
+    
+    // Atualiza o texto do frete (pode conter HTML agora se for grátis)
+    document.getElementById('taxa-entrega-cart').innerHTML = textoFrete;
+    
     document.getElementById('cart-total').innerText = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
     
     const cardFeeLine = document.getElementById('card-fee-line');
@@ -329,7 +397,6 @@ function updateCartTotal() {
         cardFeeLine.style.display = 'none';
     }
 }
-
 async function checkout() {
     const isScheduling = sessionStorage.getItem('isSchedulingOrder') === 'true';
     
@@ -405,13 +472,19 @@ async function checkout() {
         
         message += `*•••  PEDIDO ${displayName}  •••*\n\n`;
 
-        if (deliveryType === 'pickup') {
+       if (deliveryType === 'pickup') {
             message += `*TIPO:* *RETIRADA NO LOCAL*\n`;
         } else {
             message += `*TIPO:* *DELIVERY*\n`;
             message += `*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n`;
             if (reference) { message += `*PONTO DE REFERÊNCIA:* *${reference.trim()}*\n`; }
-            message += `\n*VALOR DA ENTREGA:* *R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}*\n`;
+            
+            // Usa o valorFreteFinal calculado (pode ser 0 se for promoção)
+            if (valorFreteFinal === 0 && taxaEntregaAtual > 0) {
+                 message += `\n*VALOR DA ENTREGA:* *GRÁTIS (Promoção Black Friday)*\n`;
+            } else {
+                 message += `\n*VALOR DA ENTREGA:* *R$ ${valorFreteFinal.toFixed(2).replace('.', ',')}*\n`;
+            }
         }
 
         message += `\n*PAGAMENTO:* *${paymentMethod}*`;
@@ -528,24 +601,63 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     if (isScheduling) {
+        // --- 1. LÓGICA DO BOTÃO DE VOLTAR (CANCELAR AGENDAMENTO) ---
         const schedulingNotice = document.createElement('div');
         schedulingNotice.className = 'scheduling-notice';
-        schedulingNotice.innerHTML = `<p><strong>Atenção:</strong> Você está agendando um pedido para o dia seguinte.</p>`;
+        
+        // Adicionamos um botão "Voltar" dentro do aviso
+        schedulingNotice.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <p><strong>Atenção:</strong> Você está no modo de <strong>Agendamento</strong>.</p>
+                <button id="cancel-scheduling-btn" style="background: transparent; border: 1px solid #b38200; color: #b38200; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8em;">
+                    ✕ Sair do Agendamento e Voltar
+                </button>
+            </div>
+        `;
         document.querySelector('main').prepend(schedulingNotice);
 
+        // Ação do botão de voltar
+        document.getElementById('cancel-scheduling-btn').addEventListener('click', () => {
+            sessionStorage.removeItem('isSchedulingOrder'); // Limpa a "memória" do agendamento
+            window.location.reload(); // Recarrega a página para voltar ao normal
+        });
+
+      // --- 2. LÓGICA INTELIGENTE DA DATA (CORRIGIDA) ---
         const infoBox = document.getElementById('scheduling-info-box');
         const nextDayDateSpan = document.getElementById('next-day-date');
 
         if (infoBox && nextDayDateSpan) {
-            const hoje = new Date();
-            const amanha = new Date(hoje);
-            amanha.setDate(amanha.getDate() + 1);
-            const dataFormatada = amanha.toLocaleDateString('pt-BR', {
+            const agora = new Date(); // Pega a hora exata do dispositivo do cliente
+            
+            // Usamos getHours() (local) em vez de getUTCHours()
+            const horaAtualDecimal = agora.getHours() + (agora.getMinutes() / 60);
+            const dataAgendamento = new Date(agora);
+
+            // REGRAS:
+            // 1. Se for antes da abertura (ex: 00:10, 08:00) -> Agendar para HOJE
+            if (horaAtualDecimal < DADOS_LOJA.horarioAbertura) {
+                // Mantém a data de hoje
+            } 
+            // 2. Se já passou do fechamento ou estamos abertos mas o cliente quer agendar -> AMANHÃ
+            // (Nota: como a loja está fechada para cair aqui, ou é muito cedo ou muito tarde)
+            else {
+                dataAgendamento.setDate(dataAgendamento.getDate() + 1);
+            }
+
+            const dataFormatada = dataAgendamento.toLocaleDateString('pt-BR', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric'
             });
+
             nextDayDateSpan.textContent = dataFormatada;
+            
+            // Compara dia/mês para saber se escreve HOJE ou AMANHÃ
+            const isHoje = (dataAgendamento.getDate() === agora.getDate() && dataAgendamento.getMonth() === agora.getMonth());
+            const textoDia = isHoje ? "HOJE" : "AMANHÃ";
+            
+            schedulingNotice.querySelector('p').innerHTML = `<strong>Atenção:</strong> Você está agendando um pedido para <strong>${textoDia} (${dataFormatada})</strong>.`;
+            
             infoBox.style.display = 'block';
         }
 
@@ -553,8 +665,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const timeSelect = document.getElementById('scheduling-time-select');
 
         if (timeBox && timeSelect) {
-            const startTime = 11.5;
-            const endTime = 17.5;
+            // Usa o horário da loja configurado ou o padrão 11.5 (11:30) as 17.5 (17:30)
+            const startTime = DADOS_LOJA.horarioAbertura || 11.5;
+            const endTime = DADOS_LOJA.horarioFechamento || 17.5;
             const interval = 0.5;
 
             timeSelect.innerHTML = '<option value="">Selecione um horário...</option>';
@@ -652,3 +765,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCart();
     fetchProducts(canShop);
 });
+
