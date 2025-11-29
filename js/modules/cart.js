@@ -178,7 +178,7 @@ export function updateCartTotal() {
     let textoFrete = `R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}`;
     
     // Regra: Página BF + Subtotal >= 60 + Taxa do Bairro <= 7 + Taxa não pode ser 0 (retirada)
-    if (IS_BLACK_FRIDAY && subtotal >= 60.00 && taxaEntregaAtual > 0 && taxaEntregaAtual <= 7.00) {
+    if (subtotal >= 60.00 && taxaEntregaAtual > 0 && taxaEntregaAtual <= 7.00) {
         valorFreteFinal = 0;
         textoFrete = `<span style="text-decoration: line-through; color: #777; font-size: 0.8em; margin-right: 5px;">R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}</span> <span style="color: #FFD700; font-weight: bold;">GRÁTIS</span>`;
     }

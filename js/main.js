@@ -34,7 +34,7 @@ import {
 } from './modules/utils.js';
 
 // --- ESTADO GLOBAL LOCAL ---
-// Precisamos guardar a lista de produtos aqui para o window.addToCart funcionar
+// Guardar a lista de produtos aqui para o window.addToCart funcionar
 let todosProdutos = [];
 
 // =================================================
@@ -134,7 +134,7 @@ window.copyPixKey = async () => {
 
 function setupBairrosSelect() {
     const bairroSelect = document.getElementById('bairro-select');
-    const deliveryFields = document.getElementById('delivery-fields'); // Pega o container para adicionar aviso
+    const deliveryFields = document.getElementById('delivery-fields');
     
     if (!bairroSelect) return;
 
@@ -154,8 +154,9 @@ function setupBairrosSelect() {
             textoExibicao += ` - R$ ${bairro.taxa.toFixed(2).replace('.', ',')}`;
 
             // AQUI ESTÁ A MÁGICA:
-            // Se for Black Friday E a taxa for elegível (<= 7.00), mostra o aviso
-            if (IS_BLACK_FRIDAY && bairro.taxa <= 7.00) {
+            // Removemos a verificação da Black Friday.
+            // Agora, se a taxa for elegível (<= 7.00), mostra o aviso SEMPRE.
+            if (bairro.taxa <= 7.00) {
                 textoExibicao += ` ⭐ (Grátis acima de R$60)`;
             }
         }
@@ -164,16 +165,20 @@ function setupBairrosSelect() {
         bairroSelect.appendChild(option);
     });
 
-    // Opcional: Adiciona uma legenda pequena abaixo do select apenas na Black Friday
-    // Verifica se a legenda já existe para não criar várias vezes
-    const idLegenda = 'legenda-frete-bf';
+    // Adiciona uma legenda pequena abaixo do select (Permanente)
+    const idLegenda = 'legenda-frete-promo';
     const legendaExistente = document.getElementById(idLegenda);
 
-    if (IS_BLACK_FRIDAY && !legendaExistente && deliveryFields) {
+    // Removemos a verificação IS_BLACK_FRIDAY daqui também
+    if (!legendaExistente && deliveryFields) {
         const legenda = document.createElement('p');
         legenda.id = idLegenda;
-        legenda.style.fontSize = '0.8em';
-        legenda.style.color = '#FFD700'; // Amarelo Ouro
+        legenda.style.fontSize = '0.85em';
+        
+        // MUDANÇA DE COR: O amarelo (#FFD700) é ruim de ler no fundo branco.
+        // Usei o rosa escuro da marca para ficar legível e harmônico.
+        legenda.style.color = '#a33e6b'; 
+        
         legenda.style.marginTop = '5px';
         legenda.style.marginBottom = '0';
         legenda.innerHTML = '⭐ Bairros marcados têm <strong>Entrega Grátis</strong> em compras acima de R$ 60,00.';
@@ -184,6 +189,24 @@ function setupBairrosSelect() {
 }
 
 function handleStoreStatusUI(lojaAberta, lojaForcadaFechada, isScheduling) {
+    // --- 1. ATUALIZAÇÃO DO BOTÃO DO CABEÇALHO ---
+    const btnStatus = document.querySelector('.btn-black-friday');
+    
+    if (btnStatus) {
+        // Desativa o link
+        btnStatus.removeAttribute('href');
+        btnStatus.removeAttribute('target');
+        btnStatus.style.cursor = 'default'; // Cursor normal (seta)
+
+        // Define o texto
+        if (lojaAberta) {
+            btnStatus.textContent = "Estamos ON!!!";
+        } else {
+            btnStatus.textContent = "Fechado";
+        }
+    }
+
+    // --- 2. RESTANTE DA LÓGICA (Bloqueio do Checkout) ---
     const checkoutButton = document.getElementById('checkout-button');
     const avisoContainer = document.getElementById('aviso-loja-fechada');
     
@@ -196,6 +219,7 @@ function handleStoreStatusUI(lojaAberta, lojaForcadaFechada, isScheduling) {
 
         document.body.classList.add('loja-fechada-filter');
         
+        // Monta mensagem de aviso
         let avisoMsg = `<p><strong>Desculpe, estamos fechados no momento!</strong></p>`;
         if (!lojaForcadaFechada) {
             const abertura = `${Math.floor(DADOS_LOJA.horarioAbertura)}:${(DADOS_LOJA.horarioAbertura % 1 * 60).toString().padStart(2, '0')}`;
@@ -209,7 +233,6 @@ function handleStoreStatusUI(lojaAberta, lojaForcadaFechada, isScheduling) {
             avisoContainer.innerHTML = avisoMsg;
             avisoContainer.style.display = 'block';
             
-            // Evento do botão "Agendar"
             document.getElementById('schedule-order-btn').addEventListener('click', () => {
                 sessionStorage.setItem('isSchedulingOrder', 'true');
                 window.location.reload();
@@ -217,7 +240,6 @@ function handleStoreStatusUI(lojaAberta, lojaForcadaFechada, isScheduling) {
         }
     }
 
-    // UI Específica de Agendamento (Lógica da Data corrigida)
     if (isScheduling) {
         setupSchedulingUI();
     }

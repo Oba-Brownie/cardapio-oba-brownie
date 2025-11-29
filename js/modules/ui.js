@@ -29,7 +29,6 @@ export function showNotificacao(mensagem) {
  * Inicializa e exibe o aviso especial de Frete Grátis da Black Friday
  */
 export function initBlackFridayPopup() {
-    if (!IS_BLACK_FRIDAY) return;
 
     const aviso = document.getElementById('aviso-promo-bf');
     if (aviso) {
