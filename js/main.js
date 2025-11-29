@@ -95,6 +95,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 1.5. Configurar Event Listeners (Botões e Inputs)
     setupEventListeners(canShop);
+
+    // Sincroniza a tela com o que está marcado assim que carrega
+    syncDeliveryState();
 });
 
 // =================================================
@@ -508,3 +511,53 @@ async function handleCheckout() {
         btn.textContent = 'Finalizar Pedido no WhatsApp';
     }
 }
+// =================================================
+    // FUNÇÃO AUXILIAR DE CORREÇÃO (DELIVERY/RETIRADA)
+    // =================================================
+    function syncDeliveryState() {
+        const selectedOption = document.querySelector('input[name="delivery_type"]:checked');
+        const deliveryFields = document.getElementById('delivery-fields');
+        const pickupInfo = document.getElementById('pickup-address-info');
+        const deliveryFeeLine = document.getElementById('delivery-fee-line');
+        const bairroSelect = document.getElementById('bairro-select');
+
+        // Importante: precisa importar setTaxaEntrega e LISTA_BAIRROS se eles não estiverem no escopo.
+        // Mas como este é o main.js e eles foram importados no topo, deve funcionar.
+        // Se der erro no setTaxaEntrega, certifique-se que ele está importado do módulo cart.js
+        
+        // Importa a função setTaxaEntrega do módulo cart se ainda não estiver disponível globalmente no escopo dessa função
+        // (Geralmente no main.js as importações do topo valem para o arquivo todo)
+
+        if (selectedOption && selectedOption.value === 'pickup') {
+            // Modo Retirada
+            if (deliveryFields) deliveryFields.style.display = 'none';
+            if (pickupInfo) pickupInfo.style.display = 'block';
+            if (deliveryFeeLine) deliveryFeeLine.style.display = 'none';
+            
+            // Precisamos zerar a taxa. 
+            // Como o setTaxaEntrega é importado, ele deve funcionar aqui.
+            // Se der erro, verifique se 'setTaxaEntrega' está na lista de imports no topo do main.js
+            if (typeof setTaxaEntrega === 'function') {
+                setTaxaEntrega(0);
+            }
+            
+            if (bairroSelect) bairroSelect.selectedIndex = 0;
+        } else {
+            // Modo Delivery
+            if (deliveryFields) deliveryFields.style.display = 'block';
+            if (pickupInfo) pickupInfo.style.display = 'none';
+            if (deliveryFeeLine) deliveryFeeLine.style.display = 'flex';
+            
+            // Restaura taxa se tiver bairro
+            if (bairroSelect && bairroSelect.value !== "Selecione o bairro...") {
+                // Precisamos da LISTA_BAIRROS importada no topo
+                // Como LISTA_BAIRROS é importada no topo do main.js, deve funcionar.
+                const option = bairroSelect.selectedOptions[0];
+                const taxa = option ? parseFloat(option.dataset.taxa) : 0;
+                
+                if (typeof setTaxaEntrega === 'function') {
+                    setTaxaEntrega(taxa);
+                }
+            }
+        }
+    }
