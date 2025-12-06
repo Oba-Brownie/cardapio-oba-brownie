@@ -96,14 +96,14 @@ export function renderProducts(products, lojaAberta) {
     if(destaquesContainer) destaquesContainer.innerHTML = '';
     if(natalContainer) natalContainer.innerHTML = '';
 
-    // =========================================================
-    // 1. SESSÃO ESPECIAL DE NATAL (Substitui Destaques)
+// =========================================================
+    // 1. SESSÃO ESPECIAL DE NATAL
     // =========================================================
     const produtosNatal = products.filter(p => p.categoria === 'Natal' && p.estoque > 0);
 
-    if (natalContainer && produtosNatal.length > 0 && lojaAberta) {
+ 
+    if (natalContainer && produtosNatal.length > 0) {
         
-        // Cabeçalho da Seção
         const headerHTML = `
             <div class="natal-header">
                 <h3 class="natal-title">Doce Natal Oba Brownie!</h3>
@@ -111,7 +111,6 @@ export function renderProducts(products, lojaAberta) {
             </div>
         `;
         
-        // Grid de Produtos
         const gridDiv = document.createElement('div');
         gridDiv.className = 'natal-grid';
 
@@ -119,13 +118,16 @@ export function renderProducts(products, lojaAberta) {
             const card = document.createElement('div');
             card.className = 'natal-card';
             
-            // Lógica simples de preço para o card reduzido
-            let priceDisplay = `R$ ${product.price.toFixed(2).replace('.', ',')}`;
-            if (product.originalPrice) {
-                 // Se quiser mostrar promo no natal, pode ajustar aqui, 
-                 // mas por padrão vamos focar no preço final para caber no card.
-                 priceDisplay = `R$ ${product.price.toFixed(2).replace('.', ',')}`;
+            // Define o visual do botão (Ativo ou Fechado)
+            let buttonHTML;
+            if (lojaAberta) {
+                buttonHTML = `<button class="natal-add-btn" onclick="addToCart('${product.id}')">Adicionar</button>`;
+            } else {
+                // Botão Cinza se a loja estiver fechada
+                buttonHTML = `<button class="natal-add-btn" style="background-color: #a9a9a9; cursor: not-allowed;" disabled>Fechado</button>`;
             }
+
+            let priceDisplay = `R$ ${product.price.toFixed(2).replace('.', ',')}`;
 
             card.innerHTML = `
                 <div class="natal-card-img-container">
@@ -134,7 +136,7 @@ export function renderProducts(products, lojaAberta) {
                 <div class="natal-card-info">
                     <h4 class="natal-card-name">${product.name}</h4>
                     <span class="natal-card-price">${priceDisplay}</span>
-                    <button class="natal-add-btn" onclick="addToCart('${product.id}')">Adicionar</button>
+                    ${buttonHTML}
                 </div>
             `;
             gridDiv.appendChild(card);
@@ -143,8 +145,6 @@ export function renderProducts(products, lojaAberta) {
         natalContainer.innerHTML = headerHTML;
         natalContainer.appendChild(gridDiv);
     }
-
-
     // =========================================================
     // 2. DESTAQUES (CÓDIGO ORIGINAL - DESATIVADO TEMPORARIAMENTE)
     // =========================================================
