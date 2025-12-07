@@ -285,3 +285,18 @@
 .natal-add-btn:active {
     background-color: #d65d9a;
 }
+
+/* ... (mantenha o código anterior da .natal-section, .natal-card, etc.) ... */
+
+.natal-card-description {
+    font-size: 0.85em; /* Texto um pouco menor para caber no grid */
+    color: #666;
+    margin-bottom: 10px;
+    line-height: 1.3;
+    
+    /* (Opcional) Limita a 3 linhas para não esticar demais o card */
+    display: -webkit-box;
+    -webkit-line-clamp: 3; 
+    -webkit-box-orient: vertical;
+    overflow: hidden; 
+}

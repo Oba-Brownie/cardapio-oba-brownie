@@ -101,7 +101,6 @@ export function renderProducts(products, lojaAberta) {
     // =========================================================
     const produtosNatal = products.filter(p => p.categoria === 'Natal' && p.estoque > 0);
 
- 
     if (natalContainer && produtosNatal.length > 0) {
         
         const headerHTML = `
@@ -123,7 +122,6 @@ export function renderProducts(products, lojaAberta) {
             if (lojaAberta) {
                 buttonHTML = `<button class="natal-add-btn" onclick="addToCart('${product.id}')">Adicionar</button>`;
             } else {
-                // Botão Cinza se a loja estiver fechada
                 buttonHTML = `<button class="natal-add-btn" style="background-color: #a9a9a9; cursor: not-allowed;" disabled>Fechado</button>`;
             }
 
@@ -135,6 +133,9 @@ export function renderProducts(products, lojaAberta) {
                 </div>
                 <div class="natal-card-info">
                     <h4 class="natal-card-name">${product.name}</h4>
+                    
+                    <p class="natal-card-description">${product.description}</p>
+                    
                     <span class="natal-card-price">${priceDisplay}</span>
                     ${buttonHTML}
                 </div>
