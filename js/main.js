@@ -400,9 +400,9 @@ function setupEventListeners(canShop) {
 // =================================================
 
 async function handleCheckout() {
-    const isScheduling = !!document.querySelector('.scheduling-notice'); // Detecta se está no modo agendamento
-    const cart = getCart(); // Pega itens do módulo cart
-    const cartValues = getCartValues(); // Pega valores calculados (frete, totais)
+    const isScheduling = !!document.querySelector('.scheduling-notice'); 
+    const cart = getCart(); 
+    const cartValues = getCartValues(); 
 
     if (cart.length === 0) return alert("Seu carrinho está vazio!");
 
@@ -447,16 +447,14 @@ async function handleCheckout() {
             throw new Error(errorData.error || 'Erro ao processar estoque.');
         }
 
-        // Montagem da Mensagem
+        // --- Montagem da Mensagem ---
         const displayName = name.trim().split(' ').slice(0, 2).join(' ');
         const numeroWhatsapp = '5599991675891';
         let message = `*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*\n\n`;
 
         if (isScheduling) {
             const dataTexto = document.getElementById('next-day-date').textContent;
-            message += `*‼️ PEDIDO AGENDADO ‼️*\n`;
-            message += `*PARA: ${dataTexto}*\n`;
-            message += `*HORÁRIO: ${scheduledTime}*\n\n`;
+            message += `*‼️ PEDIDO AGENDADO ‼️*\n*PARA: ${dataTexto}*\n*HORÁRIO: ${scheduledTime}*\n\n`;
         }
         
         message += `*•••  PEDIDO ${displayName}  •••*\n\n`;
@@ -464,11 +462,9 @@ async function handleCheckout() {
         if (deliveryType === 'pickup') {
             message += `*TIPO:* *RETIRADA NO LOCAL*\n`;
         } else {
-            message += `*TIPO:* *DELIVERY*\n`;
-            message += `*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n`;
+            message += `*TIPO:* *DELIVERY*\n*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n`;
             if (reference) message += `*REF:* *${reference.trim()}*\n`;
             
-            // Lógica do Frete na Mensagem (Usa o valor calculado no cart.js)
             if (cartValues.frete === 0 && deliveryType === 'delivery') {
                  message += `\n*VALOR DA ENTREGA:* *GRÁTIS (Promoção)*\n`;
             } else {
@@ -503,12 +499,47 @@ async function handleCheckout() {
         message += `\n\n*🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻🔺🔻*`;
 
         const whatsappUrl = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(message)}`;
-        window.location.href = whatsappUrl;
+        
+        // --- LÓGICA DE ÁUDIO CORRIGIDA (SEM CORTES) ---
+        
+        btn.textContent = 'Pedido Confirmado! Redirecionando...';
+        btn.style.backgroundColor = '#4CAF50'; 
+
+        const audio = new Audio('audio/confirmar_encomenda.mp3');
+        
+        let redirecionou = false;
+        const irParaWhatsApp = () => {
+            if (!redirecionou) {
+                redirecionou = true;
+                window.location.href = whatsappUrl;
+            }
+        };
+
+        // 1. Toca o áudio
+        audio.play()
+            .then(() => {
+                // Quando o áudio terminar (ended)...
+                audio.addEventListener('ended', () => {
+                    // ...Esperamos mais 500ms (meio segundo) de silêncio antes de mudar a página.
+                    // Isso garante que o navegador não corte o final do som.
+                    setTimeout(irParaWhatsApp, 500); 
+                });
+            })
+            .catch(err => {
+                console.warn("Erro ao tocar áudio:", err);
+                // Se der erro, vai direto sem esperar
+                irParaWhatsApp();
+            });
+
+        // 2. Trava de segurança aumentada para 4 segundos
+        // Caso o áudio demore muito para carregar ou trave, o cliente não fica preso.
+        setTimeout(irParaWhatsApp, 4000);
 
     } catch (error) {
         alert(error.message);
         btn.disabled = false;
         btn.textContent = 'Finalizar Pedido no WhatsApp';
+        btn.style.backgroundColor = '';
     }
 }
 // =================================================
@@ -561,3 +592,18 @@ async function handleCheckout() {
             }
         }
     }
+    // =================================================
+// 5. RECARREGAR PÁGINA AO VOLTAR DO WHATSAPP
+// =================================================
+document.addEventListener("visibilitychange", () => {
+    // Se o site ficar visível novamente (usuário voltou da outra aba/app)
+    if (document.visibilityState === "visible") {
+        const btn = document.getElementById('checkout-button');
+        
+        // Verifica se o botão está travado como "Pedido Confirmado" ou "Processando"
+        if (btn && (btn.textContent.includes('Confirmado') || btn.textContent.includes('Processando'))) {
+            console.log("Usuário voltou do WhatsApp. Recarregando página...");
+            window.location.reload();
+        }
+    }
+});

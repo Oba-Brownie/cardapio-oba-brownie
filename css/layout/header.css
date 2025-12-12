@@ -42,3 +42,17 @@ header {
 
 .info-image-left { width: 100%; max-width: 180px; height: auto; margin-top: 30px; }
 .info-image-right { width: 90%; max-width: 200px; }
+
+.info-image-right-container,
+.encomenda-whatsapp-container {
+    width: 100%;
+    display: flex;             /* Transforma a caixa em flex */
+    justify-content: center;   /* Centraliza horizontalmente */
+    align-items: center;       /* Centraliza verticalmente */
+}
+
+/* Remove margens laterais que possam estar empurrando o botão */
+.encomenda-button {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
