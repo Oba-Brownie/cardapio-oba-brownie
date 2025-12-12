@@ -79,94 +79,65 @@ function generatePriceHTML(product) {
  * @param {Array} products - Lista completa de produtos
  * @param {Boolean} lojaAberta - Se a loja está aberta ou em agendamento
  */
-/**
- * Função principal que desenha os produtos na tela
- * @param {Array} products - Lista completa de produtos
- * @param {Boolean} lojaAberta - Se a loja está aberta ou em agendamento
- */
 export function renderProducts(products, lojaAberta) {
     const productListContainer = document.getElementById('product-list');
     const destaquesContainer = document.getElementById('destaques-section');
-    const natalContainer = document.getElementById('natal-section'); // NOVO CONTAINER
     
-    if (!productListContainer) return;
+    if (!productListContainer || !destaquesContainer) return;
 
-    // Limpa containers
     productListContainer.innerHTML = '';
-    if(destaquesContainer) destaquesContainer.innerHTML = '';
-    if(natalContainer) natalContainer.innerHTML = '';
+    destaquesContainer.innerHTML = '';
 
-// =========================================================
-    // 1. SESSÃO ESPECIAL DE NATAL
-    // =========================================================
-    const produtosNatal = products.filter(p => p.categoria === 'Natal' && p.estoque > 0);
-
-    if (natalContainer && produtosNatal.length > 0) {
-        
-        const headerHTML = `
-            <div class="natal-header">
-                <h3 class="natal-title">Doce Natal Oba Brownie!</h3>
-                <span class="natal-subtitle">Presente para quem você ama na doçura Oba Brownie!</span>
-            </div>
-        `;
-        
-        const gridDiv = document.createElement('div');
-        gridDiv.className = 'natal-grid';
-
-        produtosNatal.forEach(product => {
-            const card = document.createElement('div');
-            card.className = 'natal-card';
-            
-            // Define o visual do botão (Ativo ou Fechado)
-            let buttonHTML;
-            if (lojaAberta) {
-                buttonHTML = `<button class="natal-add-btn" onclick="addToCart('${product.id}')">Adicionar</button>`;
-            } else {
-                buttonHTML = `<button class="natal-add-btn" style="background-color: #a9a9a9; cursor: not-allowed;" disabled>Fechado</button>`;
-            }
-
-            let priceDisplay = `R$ ${product.price.toFixed(2).replace('.', ',')}`;
-
-            card.innerHTML = `
-                <div class="natal-card-img-container">
-                    <img src="${product.image}" alt="${product.name}" class="natal-card-img">
-                </div>
-                <div class="natal-card-info">
-                    <h4 class="natal-card-name">${product.name}</h4>
-                    
-                    <p class="natal-card-description">${product.description}</p>
-                    
-                    <span class="natal-card-price">${priceDisplay}</span>
-                    ${buttonHTML}
-                </div>
-            `;
-            gridDiv.appendChild(card);
-        });
-
-        natalContainer.innerHTML = headerHTML;
-        natalContainer.appendChild(gridDiv);
-    }
-    // =========================================================
-    // 2. DESTAQUES (CÓDIGO ORIGINAL - DESATIVADO TEMPORARIAMENTE)
-    // =========================================================
-    /* const destaques = products.filter(p => p.destaque && p.estoque > 0);
-    if (destaquesContainer && destaques.length > 0 && lojaAberta) {
+    // Separa os destaques (apenas com estoque)
+    const destaques = products.filter(p => p.destaque && p.estoque > 0);
+    
+    // 1. RENDERIZA DESTAQUES (Carrossel)
+    if (destaques.length > 0 && lojaAberta) {
         destaquesContainer.style.display = 'block';
-        // ... (código original do carrossel omitido para economizar espaço e manter desativado)
-    } else if (destaquesContainer) {
+        
+        const title = document.createElement('h3');
+        title.className = 'category-title';
+        title.textContent = 'Destaques';
+        
+        const carousel = document.createElement('div');
+        carousel.className = 'destaques-carousel';
+        
+        destaques.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'card-destaque';
+            card.dataset.productId = product.id;
+            
+            const priceHTML = generatePriceHTML(product);
+
+            // Nota: onclick="addToCart(...)" funciona porque vamos expor a função globalmente no main.js
+            card.innerHTML = `
+                <img src="${product.image}" alt="${product.name}">
+                <div class="card-destaque-info">
+                    <h4>${product.name}</h4>
+                    <p>${product.description}</p>
+                    <div class="card-destaque-footer">
+                        ${priceHTML}
+                        <button class="card-destaque-add-button" onclick="addToCart('${product.id}')">Adicionar</button>
+                    </div>
+                </div>`;
+            carousel.appendChild(card);
+        });
+        
+        destaquesContainer.appendChild(title);
+        destaquesContainer.appendChild(carousel);
+    } else {
         destaquesContainer.style.display = 'none';
     }
-    */
 
-    // =========================================================
-    // 3. RENDERIZA LISTA PRINCIPAL (OUTRAS CATEGORIAS)
-    // =========================================================
+    // Agrupa produtos por categoria
+    // Se a loja estiver fechada, mostramos TODOS (inclusive sem estoque) como fechados.
+    // Se aberta, filtramos estoque > 0 para a lista principal.
     
     let productsToRender = [];
     if (lojaAberta) {
         productsToRender = products.filter(p => p.estoque > 0);
     } else {
-        productsToRender = products; // Mostra tudo se fechado
+        productsToRender = products; // Mostra tudo, mas bloqueado
     }
 
     const productsByCategory = productsToRender.reduce((acc, product) => { 
@@ -175,13 +146,10 @@ export function renderProducts(products, lojaAberta) {
         return acc; 
     }, {});
 
-    // REMOVI 'Natal' dessa lista para ele não aparecer duplicado (já apareceu no grid lá em cima)
     const categoryOrder = ['Promoções', 'Brownies', 'Bolos', 'Doces', 'Salgados', 'Geladinho', 'Bebidas'];
 
+    // 2. RENDERIZA LISTA PRINCIPAL
     categoryOrder.forEach(categoria => {
-        // Se a categoria for Natal, pulamos aqui pois ela já foi renderizada no topo
-        if (categoria === 'Natal') return;
-
         if (productsByCategory[categoria]) {
             const categoryTitle = document.createElement('h3');
             categoryTitle.className = 'category-title';
@@ -190,16 +158,9 @@ export function renderProducts(products, lojaAberta) {
 
             productsByCategory[categoria].forEach(product => {
                 const productElement = document.createElement('div');
-                // ... (Mantém a mesma lógica de geração de preço original)
-                let priceHTML = `<p class="product-price">R$ ${product.price.toFixed(2).replace('.', ',')}</p>`;
-                if (product.originalPrice) {
-                    priceHTML = `
-                        <div class="product-price-container">
-                            <span class="original-price">R$ ${product.originalPrice.toFixed(2).replace('.', ',')}</span>
-                            <span class="promo-price">R$ ${product.price.toFixed(2).replace('.', ',')}</span>
-                        </div>`;
-                }
+                const priceHTML = generatePriceHTML(product);
 
+                // Lógica de Bloqueio (Loja Fechada ou Esgotado visualmente)
                 if (!lojaAberta) {
                     // MODO LOJA FECHADA
                     productElement.className = 'product-item esgotado';
@@ -214,7 +175,7 @@ export function renderProducts(products, lojaAberta) {
                             <button class="add-button-esgotado" disabled>Fechado</button>
                         </div>`;
                 } else {
-                    // MODO LOJA ABERTA
+                    // MODO LOJA ABERTA (Disponível)
                     productElement.className = 'product-item';
                     productElement.dataset.productId = product.id;
                     productElement.innerHTML = `
@@ -233,9 +194,10 @@ export function renderProducts(products, lojaAberta) {
         }
     });
 
-    // 4. RENDERIZA PRODUTOS ESGOTADOS (Mantém igual)
+    // 3. RENDERIZA PRODUTOS ESGOTADOS (Apenas se loja aberta)
     if (lojaAberta) {
         const soldOutProducts = products.filter(p => p.estoque <= 0);
+        
         if (soldOutProducts.length > 0) {
             const soldOutTitle = document.createElement('h3');
             soldOutTitle.className = 'category-title';

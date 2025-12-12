@@ -21,63 +21,24 @@ header {
     object-fit: cover; 
 }
 
-/* Seção de Topo (Imagens e Botões) */
+/* Seção de Topo (Imagens) */
 .top-info-container {
     display: flex;
     justify-content: space-between;
-    align-items: center; 
+    align-items: center;
     width: 100%;
     padding: 0;
     box-sizing: border-box;
     margin-bottom: 15px;
 }
 
-/* --- BLOCOS ESQUERDO E DIREITO --- */
 .left-info, .right-info {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
+.left-info { align-items: flex-start; flex-basis: 45%; }
+.right-info { align-items: flex-end; flex-basis: 49%; }
 
-.left-info { 
-    align-items: flex-start; 
-    flex-basis: 45%; 
-}
-
-.right-info { 
-    align-items: center;      /* Centraliza os filhos verticalmente */
-    justify-content: center;
-    text-align: center;
-    flex-basis: 49%; 
-}
-
-/* --- AJUSTE DAS IMAGENS --- */
-.info-image-left { 
-    width: 100%; 
-    max-width: 180px; 
-    height: auto; 
-    margin-top: 30px; 
-}
-
-.info-image-right { 
-    width: 90%; 
-    max-width: 200px;
-    height: auto;
-    display: block; /* Garante comportamento de bloco para margens */
-    margin: 0 auto; /* Reforço de centralização da imagem */
-}
-
-/* --- CORREÇÃO FINAL PARA O BOTÃO (ADICIONE ISSO) --- */
-/* Força as caixas internas a centralizarem seus conteúdos (botão e imagem) */
-.info-image-right-container,
-.encomenda-whatsapp-container {
-    width: 100%;
-    display: flex;             /* Transforma a caixa em flex */
-    justify-content: center;   /* Centraliza horizontalmente */
-    align-items: center;       /* Centraliza verticalmente */
-}
-
-/* Remove margens laterais que possam estar empurrando o botão */
-.encomenda-button {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-}
+.info-image-left { width: 100%; max-width: 180px; height: auto; margin-top: 30px; }
+.info-image-right { width: 90%; max-width: 200px; }
