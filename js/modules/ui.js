@@ -146,7 +146,7 @@ export function renderProducts(products, lojaAberta) {
         return acc; 
     }, {});
 
-    const categoryOrder = ['Promoções', 'Brownies', 'Bolos', 'Doces', 'Salgados', 'Geladinho', 'Bebidas'];
+    const categoryOrder = ['Promoções', 'Brownies','Cookies', 'Bolos', 'Doces', 'Salgados', 'Geladinho', 'Bebidas'];
 
     // 2. RENDERIZA LISTA PRINCIPAL
     categoryOrder.forEach(categoria => {

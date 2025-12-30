@@ -137,7 +137,7 @@ window.copyPixKey = async () => {
 
 function setupBairrosSelect() {
     const bairroSelect = document.getElementById('bairro-select');
-    const deliveryFields = document.getElementById('delivery-fields');
+    // const deliveryFields = document.getElementById('delivery-fields'); // (Opcional manter se for usar depois)
     
     if (!bairroSelect) return;
 
@@ -152,43 +152,14 @@ function setupBairrosSelect() {
         // --- LÓGICA DO TEXTO DA OPÇÃO ---
         let textoExibicao = bairro.nome;
 
-        // Se for o item "Selecione...", não faz nada especial
+        // Se tiver taxa, mostra apenas o valor
         if (bairro.taxa > 0) {
             textoExibicao += ` - R$ ${bairro.taxa.toFixed(2).replace('.', ',')}`;
-
-            // AQUI ESTÁ A MÁGICA:
-            // Removemos a verificação da Black Friday.
-            // Agora, se a taxa for elegível (<= 7.00), mostra o aviso SEMPRE.
-            if (bairro.taxa <= 7.00) {
-                textoExibicao += ` ⭐ (Grátis acima de R$60)`;
-            }
         }
 
         option.textContent = textoExibicao;
         bairroSelect.appendChild(option);
     });
-
-    // Adiciona uma legenda pequena abaixo do select (Permanente)
-    const idLegenda = 'legenda-frete-promo';
-    const legendaExistente = document.getElementById(idLegenda);
-
-    // Removemos a verificação IS_BLACK_FRIDAY daqui também
-    if (!legendaExistente && deliveryFields) {
-        const legenda = document.createElement('p');
-        legenda.id = idLegenda;
-        legenda.style.fontSize = '0.85em';
-        
-        // MUDANÇA DE COR: O amarelo (#FFD700) é ruim de ler no fundo branco.
-        // Usei o rosa escuro da marca para ficar legível e harmônico.
-        legenda.style.color = '#a33e6b'; 
-        
-        legenda.style.marginTop = '5px';
-        legenda.style.marginBottom = '0';
-        legenda.innerHTML = '⭐ Bairros marcados têm <strong>Entrega Grátis</strong> em compras acima de R$ 60,00.';
-        
-        // Insere a legenda logo após o select
-        bairroSelect.parentNode.insertBefore(legenda, bairroSelect.nextSibling);
-    }
 }
 
 function handleStoreStatusUI(lojaAberta, lojaForcadaFechada, isScheduling) {
@@ -465,9 +436,8 @@ async function handleCheckout() {
             message += `*TIPO:* *DELIVERY*\n*ENDEREÇO:* *${address.trim()}, ${bairroNome}*\n`;
             if (reference) message += `*REF:* *${reference.trim()}*\n`;
             
-            if (cartValues.frete === 0 && deliveryType === 'delivery') {
-                 message += `\n*VALOR DA ENTREGA:* *GRÁTIS (Promoção)*\n`;
-            } else {
+            // Se for delivery, mostra o valor calculado (sem texto de promoção)
+            if (deliveryType === 'delivery') {
                  message += `\n*VALOR DA ENTREGA:* *R$ ${cartValues.frete.toFixed(2).replace('.', ',')}*\n`;
             }
         }

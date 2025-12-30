@@ -164,24 +164,22 @@ function renderCartItems() {
         });
     }
 }
-
 /**
- * Calcula totais, aplica regras de Black Friday e atualiza os textos de preço
+ * Calcula totais e atualiza os textos de preço (SEM PROMOÇÃO DE FRETE)
  */
 export function updateCartTotal() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const paymentMethodEl = document.getElementById('payment-method');
     const paymentMethod = paymentMethodEl ? paymentMethodEl.value : '';
     
-    // === LÓGICA DO FRETE GRÁTIS BLACK FRIDAY ===
+    // === LÓGICA DO FRETE (PROMOÇÃO REMOVIDA) ===
+    // Agora o valor final é sempre igual à taxa do bairro selecionado
     valorFreteFinal = taxaEntregaAtual;
+    
+    // Texto padrão (ex: R$ 7,00)
     let textoFrete = `R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}`;
     
-    // Regra: Página BF + Subtotal >= 60 + Taxa do Bairro <= 7 + Taxa não pode ser 0 (retirada)
-    if (subtotal >= 60.00 && taxaEntregaAtual > 0 && taxaEntregaAtual <= 7.00) {
-        valorFreteFinal = 0;
-        textoFrete = `<span style="text-decoration: line-through; color: #777; font-size: 0.8em; margin-right: 5px;">R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}</span> <span style="color: #FFD700; font-weight: bold;">GRÁTIS</span>`;
-    }
+    // (O bloco IF que dava o desconto foi removido daqui)
 
     const valorParaTaxa = subtotal + valorFreteFinal;
     taxaCartaoAtual = calculateCardFee(valorParaTaxa, paymentMethod);
