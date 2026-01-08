@@ -58,11 +58,17 @@ export function hideSplashScreen() {
 // --- RENDERIZAÇÃO DE PRODUTOS ---
 
 /**
- * Gera o HTML do preço (trata promoções e Black Friday)
+ * Gera o HTML do preço (trata promoções, Black Friday e itens Grátis)
  * @param {Object} product 
  */
 function generatePriceHTML(product) {
-    // Se tiver preço original (promoção ou BF), mostra o "De/Por"
+    // 1. LÓGICA DO ITEM GRÁTIS
+    // Se o preço for 0, retorna "Grátis" em verde
+    if (product.price === 0) {
+        return `<p class="product-price" style="color: #28a745; font-weight: bold;">Grátis</p>`;
+    }
+
+    // 2. Se tiver preço original (promoção ou BF), mostra o "De/Por"
     if (product.originalPrice) {
         return `
             <div class="product-price-container">
@@ -70,7 +76,8 @@ function generatePriceHTML(product) {
                 <span class="promo-price">R$ ${product.price.toFixed(2).replace('.', ',')}</span>
             </div>`;
     } 
-    // Preço normal
+    
+    // 3. Preço normal
     return `<p class="product-price">R$ ${product.price.toFixed(2).replace('.', ',')}</p>`;
 }
 
@@ -107,9 +114,9 @@ export function renderProducts(products, lojaAberta) {
             card.className = 'card-destaque';
             card.dataset.productId = product.id;
             
+            // Usa a função auxiliar (já trata o "Grátis")
             const priceHTML = generatePriceHTML(product);
 
-            // Nota: onclick="addToCart(...)" funciona porque vamos expor a função globalmente no main.js
             card.innerHTML = `
                 <img src="${product.image}" alt="${product.name}">
                 <div class="card-destaque-info">
@@ -130,9 +137,6 @@ export function renderProducts(products, lojaAberta) {
     }
 
     // Agrupa produtos por categoria
-    // Se a loja estiver fechada, mostramos TODOS (inclusive sem estoque) como fechados.
-    // Se aberta, filtramos estoque > 0 para a lista principal.
-    
     let productsToRender = [];
     if (lojaAberta) {
         productsToRender = products.filter(p => p.estoque > 0);
@@ -146,7 +150,8 @@ export function renderProducts(products, lojaAberta) {
         return acc; 
     }, {});
 
-    const categoryOrder = ['Promoções', 'Brownies','Cookies', 'Bolos', 'Doces', 'Salgados', 'Geladinho', 'Bebidas'];
+    // Adicionei 'Acompanhamentos' ao final como solicitado
+    const categoryOrder = ['Promoções', 'Brownies', 'Cookies', 'Bolos', 'Doces', 'Salgados', 'Geladinho', 'Bebidas', 'Acompanhamentos'];
 
     // 2. RENDERIZA LISTA PRINCIPAL
     categoryOrder.forEach(categoria => {
@@ -206,12 +211,15 @@ export function renderProducts(products, lojaAberta) {
             
             soldOutProducts.forEach(product => {
                 const productElement = document.createElement('div');
+                // Também aplicamos a lógica de preço aqui para manter consistência
+                const priceHTML = generatePriceHTML(product);
+
                 productElement.className = 'product-item esgotado';
                 productElement.innerHTML = `
                     <div class="product-info">
                         <h4 class="product-name">${product.name}</h4>
                         <p class="product-description">${product.description}</p>
-                        <p class="product-price">R$ ${product.price.toFixed(2).replace('.', ',')}</p>
+                        ${priceHTML}
                     </div>
                     <div class="product-image-container">
                         <img src="${product.image}" alt="${product.name}" class="product-image">
